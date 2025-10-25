@@ -911,49 +911,54 @@
         });
     </script>
 
-    <!-- YENİ EKLENEN PWA YÜKLEME SCRIPT'İ -->
+    <!-- GÜNCELLENMİŞ PWA YÜKLEME SCRIPT'İ (iOS DESTEĞİ İLE) -->
     <script>
         let deferredPrompt;
         const installModal = document.getElementById('installPwaModal');
         const installBtn = document.getElementById('installPwaBtn');
         const cancelBtn = document.getElementById('cancelPwaBtn');
 
+        // Chrome/Edge için 'beforeinstallprompt' olayını dinle
         window.addEventListener('beforeinstallprompt', (e) => {
             // Tarayıcının varsayılan yükleme teklifini engelle
             e.preventDefault();
             // Event'i daha sonra kullanmak üzere sakla
             deferredPrompt = e;
+            // Chrome popup'ının tetiklendiğini işaretle
+            window.pwaInstallPromptFired = true;
             // Kendi yükleme popup'ımızı göster
-            // CSS'de display: none; olarak ayarlandı, göstermek için 'flex' yapıyoruz
-            // (flex çünkü CSS'de hizalama için justify-content ve align-items kullanıldı)
-            installModal.style.display = 'flex';
+            if(installModal) installModal.style.display = 'flex';
         });
 
-        installBtn.addEventListener('click', async () => {
-            // Modal'ı gizle
-            installModal.style.display = 'none';
-            if (deferredPrompt) {
-                // Tarayıcının yükleme ekranını tetikle
-                deferredPrompt.prompt();
-                // Kullanıcının seçimini bekle
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`Kullanıcı yükleme tercihi: ${outcome}`);
-                // Prompt sadece bir kez kullanılabileceği için event'i temizle
+        if(installBtn) {
+            installBtn.addEventListener('click', async () => {
+                // Modal'ı gizle
+                if(installModal) installModal.style.display = 'none';
+                if (deferredPrompt) {
+                    // Tarayıcının yükleme ekranını tetikle
+                    deferredPrompt.prompt();
+                    // Kullanıcının seçimini bekle
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`Kullanıcı yükleme tercihi: ${outcome}`);
+                    // Prompt sadece bir kez kullanılabileceği için event'i temizle
+                    deferredPrompt = null;
+                }
+            });
+        }
+
+        if(cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                // Modal'ı gizle
+                if(installModal) installModal.style.display = 'none';
+                // Event'i temizle (Chrome için)
                 deferredPrompt = null;
-            }
-        });
+            });
+        }
 
-        cancelBtn.addEventListener('click', () => {
-            // Modal'ı gizle
-            installModal.style.display = 'none';
-            // Event'i temizle
-            deferredPrompt = null;
-        });
-
-        // Modal dışına tıklanırsa da kapat (Isınma modalı ile çakışmaz)
+        // Modal dışına tıklanırsa da kapat
         window.addEventListener('click', (event) => {
             if (event.target == installModal) {
-                installModal.style.display = 'none';
+                if(installModal) installModal.style.display = 'none';
                 deferredPrompt = null;
             }
         });
@@ -961,11 +966,58 @@
         // Uygulama yüklendiğinde
         window.addEventListener('appinstalled', (evt) => {
             console.log('İdman uygulaması başarıyla yüklendi!');
-            // Modal'ı gizle (zaten gizlenmiş olmalı ama garanti olsun)
-            installModal.style.display = 'none';
+            // Modal'ı gizle
+            if(installModal) installModal.style.display = 'none';
             deferredPrompt = null;
         });
+
+        // Sayfa yüklendiğinde iOS kontrolü yap
+        window.addEventListener('load', () => {
+            // iOS tespiti (iPad, iPhone, iPod)
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
+            // Zaten ana ekrandan mı açılmış (standalone) tespiti
+            const isStandalone = window.navigator.standalone;
+
+            // Chrome/Edge popup'ı tetiklenmişse veya bu bir iOS cihazı değilse veya
+            // uygulama zaten ana ekrandan açılmışsa hiçbir şey yapma.
+            if (window.pwaInstallPromptFired || !isIOS || isStandalone) {
+                return;
+            }
+
+            // --- Bu kod sadece iPhone/iPad'de ve uygulama yüklü değilken çalışır ---
+            
+            // Chrome'un popup'ı tetiklenmediği için 2 saniye bekle ve
+            // Sadece iOS kullanıcılarına özel bilgilendirme modalını göster.
+            setTimeout(() => {
+                // Chrome'un son anda tetiklenmediğinden emin ol
+                if (window.pwaInstallPromptFired || !installModal) return;
+
+                console.log('iOS cihazı algılandı, yükleme talimatları gösteriliyor.');
+
+                const modalTitle = installModal.querySelector('h2');
+                const modalText = installModal.querySelector('p');
+
+                if (modalTitle) modalTitle.textContent = 'Ana Ekrana Ekle';
+                if (modalText) {
+                    modalText.innerHTML = `Bu uygulamayı ana ekranınıza eklemek için, lütfen tarayıcınızın <strong class='text-cyan-300'>'Paylaş'</strong> simgesine ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 inline-block align-text-bottom mx-1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg> ) ve ardından <strong class='text-cyan-300'>'Ana Ekrana Ekle'</strong> seçeneğine dokunun.`;
+                }
+
+                // "Yükle" butonunu gizle (çünkü iOS'ta programatik olarak tetiklenemez)
+                if(installBtn) installBtn.style.display = 'none';
+                
+                if(cancelBtn) {
+                    // "Daha Sonra" butonunu "Anladım" olarak değiştir ve tam genişlik yap
+                    cancelBtn.textContent = 'Anladım';
+                    cancelBtn.style.width = '100%';
+                    cancelBtn.style.textAlign = 'center';
+                }
+
+                // Bilgilendirme modalını göster
+                installModal.style.display = 'flex';
+            }, 2000); // 2 saniye bekle
+        });
     </script>
+
 
     <!-- ACCORDION JAVASCRIPT -->
     <script>
@@ -992,3 +1044,4 @@
 
 </body>
 </html>
+
