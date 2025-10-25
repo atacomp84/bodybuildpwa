@@ -882,6 +882,31 @@
             });
         }
     </script>
+<script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Tarayıcı varsayılan mini penceresini göstermesin
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Kullanıcıya soruyu otomatik göstermek için ufak bir gecikme koy
+  setTimeout(() => {
+    const userAccepted = confirm("Uygulamayı cihazınıza yüklemek ister misiniz?");
+    if (userAccepted && deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choice => {
+        if (choice.outcome === 'accepted') {
+          console.log('Kullanıcı yüklemeyi kabul etti 🎉');
+        } else {
+          console.log('Kullanıcı reddetti 😅');
+        }
+        deferredPrompt = null;
+      });
+    }
+  }, 1500); // 1.5 saniye bekleyip soruyu gösterir
+});
+</script>
 
 </body>
 </html>
