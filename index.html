@@ -14,7 +14,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('./sw.js')
             .then(registration => {
               console.log('ServiceWorker registration successful');
             })
@@ -176,6 +176,34 @@
             display: none; /* Varsayılan olarak gizli */
             overflow: hidden;
             background-color: #1f2937; /* gray-800 */
+        }
+
+        /* --- YENİ EKLENEN PWA YÜKLEME MODALI STİLLERİ --- */
+        #installPwaModal {
+            display: none; /* JS ile 'flex' yapılacak */
+            position: fixed; 
+            z-index: 2000; /* Diğer modalın üstünde */
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.85); 
+            /* İçeriği ortalamak için flex kullanıyoruz */
+            justify-content: center;
+            align-items: center;
+        }
+        .install-modal-content {
+            background-color: #1f2937; /* gray-800 */
+            margin: auto; 
+            padding: 24px;
+            border: 1px solid #4B5563; /* gray-600 */
+            width: 90%; 
+            max-width: 450px; /* Daha küçük bir modal */
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-align: center;
         }
 
     </style>
@@ -753,7 +781,28 @@
             </div>
         </section>
 
+    </div> <!-- .container sonu -->
+
+    <!-- YENİ EKLENEN PWA YÜKLEME MODALI -->
+    <div id="installPwaModal" class="modal">
+        <!-- class="modal" eklendi, böylece dışarı tıklama gibi temel davranışları alabilir -->
+        <div class="install-modal-content p-6">
+            <img src="logo.png" alt="Logo" class="w-20 h-20 mx-auto mb-4">
+            <h2 class="text-2xl font-bold text-cyan-400 mb-3">Uygulamayı Yükle</h2>
+            <p class="text-gray-300 mb-6">
+                Bu uygulamayı ana ekranınıza ekleyerek daha hızlı erişim sağlayın ve çevrimdışı kullanın.
+            </p>
+            <div class="flex gap-4">
+                <button id="cancelPwaBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                    Daha Sonra
+                </button>
+                <button id="installPwaBtn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg">
+                    Yükle
+                </button>
+            </div>
+        </div>
     </div>
+
 
     <!-- ISINMA MODALI -->
     <div id="isinaModal" class="modal">
@@ -853,11 +902,69 @@
         var span = document.getElementById("closeModalBtn");
         btn.onclick = function() { modal.style.display = "block"; }
         span.onclick = function() { modal.style.display = "none"; }
-        window.onclick = function(event) {
+        
+        // window.onclick'i addEventListener ile değiştiriyoruz ki PWA script'i ile çakışmasın
+        window.addEventListener('click', function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
-        }
+        });
+    </script>
+
+    <!-- YENİ EKLENEN PWA YÜKLEME SCRIPT'İ -->
+    <script>
+        let deferredPrompt;
+        const installModal = document.getElementById('installPwaModal');
+        const installBtn = document.getElementById('installPwaBtn');
+        const cancelBtn = document.getElementById('cancelPwaBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Tarayıcının varsayılan yükleme teklifini engelle
+            e.preventDefault();
+            // Event'i daha sonra kullanmak üzere sakla
+            deferredPrompt = e;
+            // Kendi yükleme popup'ımızı göster
+            // CSS'de display: none; olarak ayarlandı, göstermek için 'flex' yapıyoruz
+            // (flex çünkü CSS'de hizalama için justify-content ve align-items kullanıldı)
+            installModal.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            // Modal'ı gizle
+            installModal.style.display = 'none';
+            if (deferredPrompt) {
+                // Tarayıcının yükleme ekranını tetikle
+                deferredPrompt.prompt();
+                // Kullanıcının seçimini bekle
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Kullanıcı yükleme tercihi: ${outcome}`);
+                // Prompt sadece bir kez kullanılabileceği için event'i temizle
+                deferredPrompt = null;
+            }
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            // Modal'ı gizle
+            installModal.style.display = 'none';
+            // Event'i temizle
+            deferredPrompt = null;
+        });
+
+        // Modal dışına tıklanırsa da kapat (Isınma modalı ile çakışmaz)
+        window.addEventListener('click', (event) => {
+            if (event.target == installModal) {
+                installModal.style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
+
+        // Uygulama yüklendiğinde
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('İdman uygulaması başarıyla yüklendi!');
+            // Modal'ı gizle (zaten gizlenmiş olmalı ama garanti olsun)
+            installModal.style.display = 'none';
+            deferredPrompt = null;
+        });
     </script>
 
     <!-- ACCORDION JAVASCRIPT -->
@@ -865,7 +972,7 @@
         var acc = document.getElementsByClassName("accordion-button");
         var i;
 
-        for (i = 0; i < acc.length; i++) {
+        for (i = 0; i< acc.length; i++) {
             acc[i].addEventListener("click", function() {
                 // Butona 'active' class'ı ekle/kaldır
                 this.classList.toggle("active");
@@ -882,33 +989,6 @@
             });
         }
     </script>
-<script>
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Tarayıcı varsayılan mini penceresini göstermesin
-  e.preventDefault();
-  deferredPrompt = e;
-
-  // Kullanıcıya soruyu otomatik göstermek için ufak bir gecikme koy
-  setTimeout(() => {
-    const userAccepted = confirm("Uygulamayı cihazınıza yüklemek ister misiniz?");
- if (userAccepted && deferredPrompt) {
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(choice => {
-    if (choice.outcome === 'accepted') {
-      console.log('Kullanıcı yüklemeyi kabul etti 🎉');
-    } else {
-      console.log('Kullanıcı reddetti 😅');
-    }
-    deferredPrompt = null; // sadece SONRA sıfırla!
-  });
-}
-
-  }, 1500); // 1.5 saniye bekleyip soruyu gösterir
-});
-</script>
 
 </body>
 </html>
-
