@@ -1,8 +1,11 @@
 const CACHE_NAME = 'idman-app-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/logo.png',
+  './',
+  './index.html',
+  './logo.png',
+  './manifest.json',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
 ];
