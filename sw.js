@@ -1,91 +1,133 @@
-const CACHE_NAME = 'idman-app-v1';
-// Sadece yerel (same-origin) statik dosyaları önbelleğe almak daha güvenli.
+const CACHE_NAME = 'idman-app-v2'; // Sürümü güncelledik
+// Ana dosyalar
 const urlsToCache = [
- '/', '/index.html', '/manifest.json', '/logo.png',
-'/icons/icon-192x192.png', '/icons/icon-512x512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './logo.png',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png'
+];
 
+// Uygulamada kullanılan egzersiz resimleri
+const imageUrls = [
+    './dumbellbench.jpg',
+    './seatedshoulder.png',
+    './incline dumbell.jpg',
+    './lateralraise.jpg',
+    './tricepspush.jpg',
+    './overheadextension.jpg',
+    './latpulldown.jpg',
+    './seatedcable.jpg',
+    './singlearm.jpg',
+    './facepull.jpg',
+    './bicepcurl.jpg',
+    './hummercurl.jpg',
+    './leggpress.jpg',
+    './legext.jpg',
+    './lyingleg.jpg',
+    './calfraise.jpg',
+    './reversecrunch.jpg',
+    './plank.jpg',
+    './runninng.jpg'
 ];
 
 self.addEventListener('install', event => {
-  // cache.addAll tek tek başarısız olursa tüm işlemi reddeder; bu yüzden
-  // kendi caching mantığımızı kullanıyoruz ve başarısız olanları atlıyoruz.
+  // waitUntil, içindeki async işlem bitene kadar 'install' aşamasını bitirmez.
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      for (const url of urlsToCache) {
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      console.log('Cache açıldı, dosyalar önbelleğe alınıyor...');
+      
+      // Ana dosyaları ekle
+      // addAll atomiktir, biri bile başarısız olursa hepsi başarısız olur.
+      try {
+        await cache.addAll(urlsToCache);
+      } catch (err) {
+         console.warn('Ana dosyalar addAll ile önbelleğe alınamadı, tek tek deneniyor...', err);
+         // addAll başarısız olursa tek tek dene
+         for (const url of urlsToCache) {
+           try {
+             await cache.add(url);
+           } catch (addErr) {
+             console.warn(`Install: Ana kaynak önbelleğe alınamadı: ${url}`, addErr);
+           }
+         }
+      }
+
+      // Resimleri önbelleğe al
+      // Resimlerin yüklenmesi install'u başarısız kılmasın, o yüzden tek tek deniyoruz.
+      console.log('Resimler önbelleğe alınıyor...');
+      for (const url of imageUrls) {
         try {
-const request = new Request(url);
-          const response = await fetch(request);
-          if (response && response.ok) {
-            await cache.put(request, response.clone());
-          } else {
-            console.warn('Install: kaynak önbelleğe alınmadı (bad response):', url, response && response.status);
-          }
+          // cache.add() dosyayı fetch edip cache'e atar
+          await cache.add(url);
         } catch (err) {
-          console.warn('Install: kaynak önbelleğe alınamadı (fetch failed):', url, err);
+          // Bir resim başarısız olursa sadece uyar, kuruluma devam et
+          console.warn(`Resim önbelleğe alınamadı (sorun değil, devam ediliyor): ${url}`, err);
         }
       }
-    })
+      console.log('Tüm varlıklar önbelleğe alındı.');
+    })()
   );
+  // Yeni service worker'ın eskisiyle çakışmadan hemen aktif olmasını sağla
+  self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
+  // Sadece http/https isteklerini işle, chrome-extension:// vb. olanları yoksay
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
+  // "Cache First" stratejisi
   event.respondWith(
     (async () => {
-      // Eğer istek http/https protokolü dışındaysa (ör. chrome-extension://),
-      // servis worker'ın cache mantığına sokmayalım — doğrudan fetch et.
-      try {
-        const proto = new URL(event.request.url).protocol;
-        if (proto !== 'http:' && proto !== 'https:') {
-          return fetch(event.request);
-        }
-      } catch (e) {
-        // URL parse edilemezse, fallback olarak doğrudan fetch et
-        return fetch(event.request);
+      // 1. Önbellekte var mı diye bak
+      const cachedResponse = await caches.match(event.request);
+      if (cachedResponse) {
+        // Önbellekte varsa, doğrudan onu döndür
+        return cachedResponse;
       }
 
-      return caches.match(event.request).then(response => {
-        if (response) {
-          return response;
+      // 2. Önbellekte yoksa, ağdan getirmeyi dene
+      try {
+        const networkResponse = await fetch(event.request);
+        
+        // 3. Ağı yanıtını alırsak, önbelleğe ekle ve döndür
+        // Sadece 'GET' isteklerini ve başarılı (200) yanıtları önbelleğe al
+        if (event.request.method === 'GET' && networkResponse.status === 200) {
+            const cache = await caches.open(CACHE_NAME);
+            // Yanıtı klonla, çünkü hem cache'e hem tarayıcıya gidecek
+            await cache.put(event.request, networkResponse.clone());
         }
 
-        return fetch(event.request)
-          .then(response => {
-            // Geçersiz cevapsa sadece döndür
-            if (!response || !response.ok) {
-              return response;
-            }
+        return networkResponse;
+      } catch (error) {
+        // Ağ hatası. Önbellekte de yoktu.
+        console.warn('Ağ hatası, kaynak getirilemedi ve önbellekte de yok:', event.request.url, error);
+        // İsteğe bağlı olarak burada 'çevrimdışı' bir sayfa döndürebiliriz.
+        // return caches.match('./offline.html');
+      }
+    })()
+  );
+});
 
-            // Sadece aynı-origin ve GET isteklerini cache'le
-            try {
-              const reqUrl = new URL(event.request.url);
-              const isSameOrigin = reqUrl.origin === self.location.origin;
-              const isHttpScheme = reqUrl.protocol === 'http:' || reqUrl.protocol === 'https:';
-              const isGet = event.request.method === 'GET';
-
-              if (isSameOrigin && isHttpScheme && isGet) {
-                const responseToCache = response.clone();
-                caches.open(CACHE_NAME).then(cache => {
-                  try {
-                    cache.put(event.request, responseToCache);
-                  } catch (err) {
-                    // Unsupported scheme (chrome-extension:// vb.) veya diğer hatalarda sıkıntıyı yut
-                    console.warn('Cache put atlanıyor (unsupported request):', event.request.url, err);
-                  }
-                });
-              }
-            } catch (e) {
-              // URL parse hatası veya benzeri durumlarda cache işleminden vazgeç
-              console.warn('Fetch handler URL parse hatası veya caching atlandı:', event.request.url, e);
-            }
-
-            return response;
-          })
-          .catch(err => {
-            // Ağ hatası olursa cache'den dönmeyi dene, yoksa hatayı ileri fırlat
-            console.warn('Fetch failed, trying cache fallback for:', event.request.url, err);
-            return caches.match(event.request).then(cached => cached || Promise.reject(err));
-          });
-      });
+self.addEventListener('activate', event => {
+  // Eski, gereksiz cache'leri temizle
+  event.waitUntil(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Eski cache temizleniyor:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+      // Aktif service worker'ın sayfayı hemen kontrol etmesini sağla
+      return self.clients.claim();
     })()
   );
 });
