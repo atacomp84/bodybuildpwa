@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v6'; // Kare ikonlar, kullanılmayan görseller çıkarıldı
+const CACHE_NAME = 'idman-app-v8'; // Tüm vücut A/B/C programı
 // Ana dosyalar
 const urlsToCache = [
   './',
@@ -21,29 +21,29 @@ const imageUrls = [
     './seatedcable.jpg',
     './singlearm.jpg',
     './runninng.jpg',
-    // Muadil GIF'leri
-    './f2/Chest-Press-Machine.gif',
-    './f1/overhead.gif',
-    './f1/dumbbell-chest-supported-row-exercise.gif',
-    './f1/cable-rear-delt-fly.gif',
-    './f2/Z-Bar-Curl.gif',
-    './f1/ez-bar-preacher-curl-exercise.gif',
-    './f1/BBSQ.gif',
-    './f2/Kneeling-Cable-Crunch.gif',
-    // Hareket GIF'leri
-    './f1/Incline-Dumbbell-Press.gif',
+    // Hareket ve muadil GIF'leri (index.html'deki DAYS listesiyle aynı tutun)
+    './Leg-Press.gif',
+    './Dumbbell-Goblet-Squat.gif',
+    './LEG-EXTENSION.gif',
+    './Barbell-Good-Morning.gif',
+    './cablebicepscurl.gif',
+    './f1/Lat-Pulldown.gif',
+    './f1/neutral Lat-Pulldown.gif',
+    './f1/lrase.gif',
     './f1/One-arm-triceps-pushdown.gif',
     './f1/High-Pulley-Overhead-Tricep-Extension.gif',
-    './f1/Lat-Pulldown.gif',
+    './f1/Incline-Dumbbell-Press.gif',
+    './f1/dumbbell-chest-supported-row-exercise.gif',
     './f1/Face-Pull.gif',
-    './f1/Flexor-Incline-Dumbbell-Curls.gif',
-    './f1/Seated-Hammer-Curl.gif',
-    './Leg-Press.gif',
-    './LEG-EXTENSION.gif',
+    './f1/cable-rear-delt-fly.gif',
     './f1/LEG_CURL.gif',
-    './Standing-Calf-Raise.gif',
-    './f1/lrase.gif',
-    './f2/Weighted-Front-Plank.gif'
+    './f1/Flexor-Incline-Dumbbell-Curls.gif',
+    './f1/ez-bar-preacher-curl-exercise.gif',
+    './f1/Seated-Hammer-Curl.gif',
+    './f2/Chest-Press-Machine.gif',
+    './f2/Z-Bar-Curl.gif',
+    './f2/Weighted-Front-Plank.gif',
+    './f2/Kneeling-Cable-Crunch.gif'
 ];
 
 self.addEventListener('install', event => {

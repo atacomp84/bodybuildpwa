@@ -7,7 +7,16 @@
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" href="icons/icon-192x192.png" type="image/png">
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#030712">
+    <meta name="theme-color" content="#f3f5f9">
+    <script>
+      // Tema, sayfa çizilmeden önce uygulanır (açılışta yanıp sönmesin diye)
+      (function () {
+        var t = 'light';
+        try { t = JSON.parse(localStorage.getItem('idman:theme')) || 'light'; } catch (e) {}
+        document.documentElement.setAttribute('data-theme', t);
+        document.querySelector('meta[name="theme-color"]').content = t === 'dark' ? '#030712' : '#f3f5f9';
+      })();
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="İdman">
@@ -24,7 +33,35 @@
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Açık tema (varsayılan) */
         :root {
+            --bg: #f3f5f9;
+            --surface: #ffffff;
+            --surface-2: #f1f4f8;
+            --surface-3: #e3e8ef;
+            --border: #dde3eb;
+            --text: #0f172a;
+            --muted: #475569;
+            --faint: #64748b;
+            --hl: #b45309;          /* vurgulu metin (set/tekrar, süreler) */
+            --hl-2: #c2410c;        /* back-off */
+            --tag: #fde047;         /* sarı rozet zemini */
+            --green: #16a34a;
+            --on-accent: #ffffff;   /* vurgu renginin üstündeki yazı */
+            --bar-bg: rgba(243, 245, 249, .9);
+            --timer-bg: rgba(255, 255, 255, .97);
+            --warm-bg: linear-gradient(135deg, #fef9c3, #ffedd5);
+            --warm-border: #fcd34d;
+            --warm-ico-bg: #fde68a;
+            --warm-ico: #92400e;
+            --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 6px 18px -8px rgba(15, 23, 42, .12);
+            --accent: #0e7490;      /* aktif güne göre JS ile değişir */
+            --accent-soft: rgba(14, 116, 144, .12);
+            --radius: 16px;
+            color-scheme: light;
+        }
+        /* Koyu tema */
+        :root[data-theme="dark"] {
             --bg: #030712;
             --surface: #0d1321;
             --surface-2: #151d2e;
@@ -33,11 +70,18 @@
             --text: #f9fafb;
             --muted: #94a3b8;
             --faint: #64748b;
-            --yellow: #fde047;
+            --hl: #fde047;
+            --hl-2: #fdba74;
             --green: #4ade80;
-            --accent: #22d3ee;      /* aktif güne göre JS ile değişir */
-            --accent-soft: rgba(34, 211, 238, .14);
-            --radius: 16px;
+            --on-accent: #0b0f19;
+            --bar-bg: rgba(3, 7, 18, .85);
+            --timer-bg: rgba(13, 19, 33, .96);
+            --warm-bg: linear-gradient(135deg, rgba(253,224,71,.14), rgba(251,146,60,.10));
+            --warm-border: rgba(253,224,71,.35);
+            --warm-ico-bg: rgba(253,224,71,.18);
+            --warm-ico: #fde047;
+            --shadow: none;
+            color-scheme: dark;
         }
         * { box-sizing: border-box; }
         html { -webkit-text-size-adjust: 100%; }
@@ -62,6 +106,12 @@
         .hero h1 { margin: 0; font-size: clamp(1.4rem, 4.5vw, 2rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
         .hero p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
         @media (max-width: 480px) { .hero img { width: 54px; height: 54px; } .hero { gap: 12px; } }
+        .theme-btn {
+            margin-left: auto; align-self: flex-start; flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px;
+            display: grid; place-items: center; background: var(--surface); border: 1px solid var(--border);
+            color: var(--muted); box-shadow: var(--shadow); transition: color .15s, border-color .15s;
+        }
+        .theme-btn:hover { color: var(--text); border-color: var(--faint); }
         .today-pill {
             display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
             padding: 4px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600;
@@ -70,31 +120,31 @@
 
         /* --- ÖZET KUTULARI --- */
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-        .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
+        .stat { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 14px; padding: 12px; text-align: center; }
         .stat b { display: block; font-size: 1.35rem; font-weight: 800; }
         .stat span { font-size: .75rem; color: var(--muted); }
 
         .warmup-btn {
             width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
-            padding: 14px 16px; border-radius: var(--radius); border: 1px solid rgba(253,224,71,.35);
-            background: linear-gradient(135deg, rgba(253,224,71,.14), rgba(251,146,60,.10));
+            padding: 14px 16px; border-radius: var(--radius); border: 1px solid var(--warm-border);
+            background: var(--warm-bg); box-shadow: var(--shadow);
             transition: transform .15s, border-color .15s;
         }
-        .warmup-btn:hover { transform: translateY(-2px); border-color: rgba(253,224,71,.6); }
-        .warmup-btn .ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: rgba(253,224,71,.18); color: var(--yellow); }
+        .warmup-btn:hover { transform: translateY(-2px); border-color: var(--hl); }
+        .warmup-btn .ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--warm-ico-bg); color: var(--warm-ico); }
         .warmup-btn b { display: block; font-size: 1rem; }
         .warmup-btn small { color: var(--muted); font-size: .8rem; }
-        .warmup-btn .tag { margin-left: auto; font-size: .7rem; font-weight: 700; color: #111; background: var(--yellow); padding: 3px 8px; border-radius: 999px; }
+        .warmup-btn .tag { margin-left: auto; font-size: .7rem; font-weight: 700; color: #111; background: var(--tag); padding: 3px 8px; border-radius: 999px; }
 
         /* --- GÜN SEKMELERİ --- */
         .tabs-bar {
             position: sticky; top: 0; z-index: 50; margin: 22px -16px 0; padding: 10px 16px;
-            background: rgba(3,7,18,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            background: var(--bar-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
         }
         .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .tab {
-            position: relative; overflow: hidden; padding: 10px 8px; border-radius: 12px; text-align: center;
+            position: relative; box-shadow: var(--shadow); overflow: hidden; padding: 10px 8px; border-radius: 12px; text-align: center;
             background: var(--surface); border: 1px solid var(--border); transition: border-color .2s, background .2s;
         }
         .tab .t-day { display: block; font-size: .68rem; color: var(--faint); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
@@ -125,7 +175,7 @@
         .ex {
             display: flex; flex-direction: column; overflow: hidden;
             background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-            transition: border-color .25s, transform .2s, box-shadow .2s;
+            box-shadow: var(--shadow); transition: border-color .25s, transform .2s, box-shadow .2s;
         }
         .ex:hover { box-shadow: 0 12px 30px -12px rgba(0,0,0,.6); }
         .ex.done { border-color: color-mix(in srgb, var(--green) 55%, var(--border)); }
@@ -140,7 +190,7 @@
         .ex-num {
             position: absolute; top: 10px; left: 10px; width: 32px; height: 32px; border-radius: 10px;
             display: grid; place-items: center; font-weight: 800; font-size: .95rem;
-            background: var(--accent); color: #0b0f19; box-shadow: 0 4px 12px rgba(0,0,0,.4);
+            background: var(--accent); color: var(--on-accent); box-shadow: 0 4px 12px rgba(0,0,0,.4);
         }
         .ex.done .ex-num { background: var(--green); }
         .play {
@@ -165,11 +215,20 @@
             display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; font-weight: 600;
             padding: 5px 9px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border);
         }
-        .meta.sets { color: var(--yellow); }
-        .meta.backoff { color: #fdba74; }
+        .meta.sets { color: var(--hl); }
+        .meta.backoff { color: var(--hl-2); }
         button.meta.rest { color: var(--muted); }
         button.meta.rest:hover { color: var(--text); border-color: var(--faint); }
         .tip { margin: 10px 0 0; font-size: .86rem; color: var(--muted); }
+        .breath {
+            display: flex; align-items: flex-start; gap: 6px; margin: 8px 0 0; padding: 7px 10px; border-radius: 10px;
+            font-size: .8rem; color: var(--accent); background: var(--accent-soft);
+        }
+        .breath svg { margin-top: 2px; }
+        .meta.rir { color: var(--green); }
+        .no-img { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; color: var(--accent); background: var(--accent-soft); }
+        .no-img svg { width: 34px; height: 34px; }
+        .no-img small { font-weight: 600; font-size: .8rem; }
 
         .tracker { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
         .set-btns { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -182,7 +241,7 @@
         .set-btn:hover { border-color: var(--accent); color: var(--text); }
         .set-btn:active { transform: scale(.94); }
         .set-btn.bo { border-style: dashed; }
-        .set-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #0b0f19; }
+        .set-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
         .ex.done .set-btn[aria-pressed="true"] { background: var(--green); border-color: var(--green); }
         .weight { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); margin-left: auto; }
         .weight input {
@@ -219,16 +278,19 @@
         .section-title { display: flex; align-items: center; gap: 10px; margin: 36px 0 14px; font-size: 1.2rem; font-weight: 800; }
         .section-title svg { color: var(--accent); }
         .guide { display: grid; gap: 12px; }
-        @media (min-width: 720px) { .guide { grid-template-columns: 1fr 1fr; } }
-        .g-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+        @media (min-width: 720px) {
+            .guide { grid-template-columns: 1fr 1fr; }
+            .guide > .g-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+        }
+        .g-card { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: var(--radius); padding: 16px; }
         .g-card h3 { margin: 0 0 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
         .g-card h3 svg { color: var(--accent); }
         .g-card p { margin: 0 0 8px; font-size: .86rem; color: var(--muted); }
         .g-card strong { color: var(--text); }
-        .hl { color: var(--yellow) !important; }
+        .hl { color: var(--hl) !important; }
         .rest-rows { display: grid; gap: 6px; }
         .rest-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); font-size: .85rem; }
-        .rest-row b { color: var(--yellow); }
+        .rest-row b { color: var(--hl); }
         .steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
         .steps li { display: flex; gap: 10px; font-size: .86rem; color: var(--muted); }
         .steps li i { font-style: normal; flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; font-weight: 800; background: var(--accent-soft); color: var(--accent); }
@@ -236,14 +298,14 @@
         .cardio img { width: 84px; height: 84px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
         .notes { display: grid; gap: 10px; }
         .note { display: flex; gap: 10px; font-size: .86rem; color: var(--muted); }
-        .note .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); margin-top: 7px; flex-shrink: 0; }
+        .note .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hl); margin-top: 7px; flex-shrink: 0; }
         footer { text-align: center; color: var(--faint); font-size: .75rem; padding: 32px 0 120px; }
 
         /* --- DİNLENME ZAMANLAYICISI --- */
         .timer {
             position: fixed; left: 50%; bottom: 16px; z-index: 900; width: min(520px, calc(100% - 24px));
             transform: translate(-50%, 150%); transition: transform .35s cubic-bezier(.2,.9,.3,1.2);
-            background: rgba(13,19,33,.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            background: var(--timer-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
             border: 1px solid var(--border); border-radius: 18px; padding: 12px 14px 14px;
             box-shadow: 0 20px 50px -10px rgba(0,0,0,.8);
             margin-bottom: env(safe-area-inset-bottom);
@@ -255,7 +317,7 @@
         .timer-label b { display: block; color: var(--text); font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .timer-btns { display: flex; gap: 6px; }
         .timer-btns button { height: 38px; min-width: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); font-weight: 700; font-size: .8rem; }
-        .timer-btns button.primary { background: var(--accent); color: #0b0f19; border-color: var(--accent); }
+        .timer-btns button.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
         .timer-track { height: 4px; border-radius: 4px; background: var(--surface-3); margin-top: 10px; overflow: hidden; }
         .timer-fill { height: 100%; background: var(--accent); width: 100%; transition: width .25s linear; }
         .timer.finished { border-color: var(--green); }
@@ -278,19 +340,19 @@
         .sheet-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
         .sheet-close:hover { color: var(--text); }
         .sheet h2 { margin: 0 40px 4px 0; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-        .sheet h2 svg { color: var(--yellow); }
+        .sheet h2 svg { color: var(--hl); }
         .sheet .lead { color: var(--muted); font-size: .88rem; margin: 0 0 18px; }
         .phase { position: relative; padding-left: 34px; padding-bottom: 18px; }
         .phase:not(:last-of-type)::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: 0; width: 2px; background: var(--border); }
-        .phase-num { position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .85rem; background: var(--yellow); color: #111; }
+        .phase-num { position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .85rem; background: var(--tag); color: #111; }
         .phase h3 { margin: 2px 0 2px; font-size: 1rem; }
-        .phase h3 span { color: var(--yellow); font-weight: 600; font-size: .82rem; margin-left: 4px; }
+        .phase h3 span { color: var(--hl); font-weight: 600; font-size: .82rem; margin-left: 4px; }
         .phase p { margin: 0 0 10px; color: var(--muted); font-size: .84rem; }
         .moves { display: grid; gap: 8px; }
         @media (min-width: 560px) { .moves { grid-template-columns: 1fr 1fr; } }
         .move { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); font-size: .86rem; }
         .move b { font-weight: 600; }
-        .move span { color: var(--yellow); font-weight: 700; font-size: .78rem; text-align: right; }
+        .move span { color: var(--hl); font-weight: 700; font-size: .78rem; text-align: right; }
         .ready { text-align: center; color: var(--green); font-weight: 700; margin: 6px 0 0; }
 
         #installPwaModal { z-index: 2000; align-items: center; }
@@ -300,7 +362,7 @@
         .install-sheet p { color: var(--muted); margin: 0 0 20px; font-size: .92rem; }
         .btn-row { display: flex; gap: 10px; }
         .btn { flex: 1; padding: 12px 14px; border-radius: 12px; font-weight: 700; border: 1px solid var(--border); background: var(--surface-3); }
-        .btn.primary { background: var(--accent); color: #0b0f19; border-color: var(--accent); }
+        .btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -315,9 +377,10 @@
             <img src="logo.png" alt="Logo">
             <div>
                 <h1>Bölgesel Vücut Geliştirme Planı</h1>
-                <p>Haftada 3 gün · İtiş / Çekiş / Bacak (PPL)</p>
+                <p>Haftada 3 gün · Tüm Vücut A / B / C · Sakin tempo</p>
                 <span class="today-pill" id="todayPill"></span>
             </div>
+            <button class="theme-btn" id="themeBtn" aria-label="Temayı değiştir" title="Açık / koyu tema"></button>
         </header>
 
         <!-- Özet -->
@@ -352,13 +415,25 @@
             <div class="g-card">
                 <h3>
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
-                    Ağırlık Artırma (Nippard)
+                    Ağırlık Artırma (Nippard + Helms)
                 </h3>
-                <p>Kas gelişimi için "Aşamalı Yüklenme" şarttır. <strong class="hl">"Çift Yükseltme"</strong> metodunu kullanın:</p>
+                <p>Kas gelişimi için "Aşamalı Yüklenme" şarttır, ama <strong>yavaş ve sakin</strong>. <strong class="hl">"Çift Yükseltme"</strong> metodunu kullanın:</p>
                 <ol class="steps">
-                    <li><i>1</i><span>Hedef: <strong>3 Ağır Set × 8-12 Tekrar</strong>.</span></li>
-                    <li><i>2</i><span>3 sette de 12 tekrarı başarırsanız, bir sonraki antrenmanda ağırlığı minimum miktarda artırın.</span></li>
+                    <li><i>1</i><span>Her sette <strong>2-3 tekrar daha yapabilecekken durun</strong> (RIR 2-3). Hiçbir seti tükenene kadar götürmeyin.</span></li>
+                    <li><i>2</i><span>Tekrar aralığının üst sınırına (ör. 12) tüm setlerde rahatça ulaşınca ağırlığı <strong>1-2,5 kg</strong> artırın.</span></li>
                     <li><i>3</i><span>Kullandığınız ağırlığı kartlardaki <strong>kg</strong> kutusuna yazın; bir sonraki sefer hatırlanır.</span></li>
+                </ol>
+            </div>
+            <div class="g-card">
+                <h3>
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
+                    Kalp ve Nefes Güvenliği
+                </h3>
+                <ol class="steps">
+                    <li><i>1</i><span><strong>Nefesi tutmayın.</strong> Kaldırırken nefes verin, indirirken alın. Nefes tutmak tansiyonu ve nabzı hızla yükseltir.</span></li>
+                    <li><i>2</i><span>Nabzınız ve nefesiniz sakinleşmeden yeni sete başlamayın. Sayaç bittiyse ama hazır değilseniz <strong>+15</strong> ile uzatın.</span></li>
+                    <li><i>3</i><span><strong>Çarpıntı, göğüs ağrısı, baş dönmesi veya nefes darlığında</strong> antrenmanı bırakın, oturun ve sakin nefes alın.</span></li>
+                    <li><i>4</i><span>Antrenman öncesi kafein / pre-workout kullanmayın. Kalp ritmi için doktor kontrolünüzü ihmal etmeyin.</span></li>
                 </ol>
             </div>
             <div class="g-card">
@@ -366,11 +441,11 @@
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                     Set Arası Dinlenme
                 </h3>
-                <p>Bir seti işaretlediğinizde dinlenme sayacı otomatik başlar.</p>
+                <p>Bir seti işaretlediğinizde dinlenme sayacı otomatik başlar. Süreler kalbi zorlamamak için bilerek uzun tutuldu.</p>
                 <div class="rest-rows">
-                    <div class="rest-row">Ağır bileşik setler <b>2-3 dk</b></div>
-                    <div class="rest-row">İzolasyon & back-off setler <b>60-90 sn</b></div>
-                    <div class="rest-row">Karın hareketleri <b>30-60 sn</b></div>
+                    <div class="rest-row">Bacak & kalça (Leg Press, Squat, RDL) <b>2,5 dk</b></div>
+                    <div class="rest-row">Diğer tüm hareketler <b>2 dk</b></div>
+                    <div class="rest-row">Hazır hissetmiyorsanız <b>+15 sn uzatın</b></div>
                 </div>
             </div>
             <div class="g-card">
@@ -382,7 +457,8 @@
                     <img src="runninng.jpg" alt="Tempolu yürüyüş" loading="lazy">
                     <div>
                         <p><strong>1 Saat Tempolu Yürüyüş</strong></p>
-                        <p>Ağırlık antrenmanı yaptığınız 3 günün <strong class="hl">hemen sonrasında</strong>. Göğüs ve göbekteki yağlanmanın ana çözümü budur.</p>
+                        <p>Ağırlık antrenmanı yaptığınız 3 günün <strong class="hl">hemen sonrasında</strong>, konuşabileceğiniz bir tempoda. Yağ yakımı ve anksiyete için en etkili egzersizlerden biri.</p>
+                        <p>Dinlenme günlerinde <strong>30 dk sakin yürüyüş</strong> de ekleyebilirsiniz.</p>
                     </div>
                 </div>
             </div>
@@ -399,7 +475,7 @@
             </div>
         </div>
 
-        <footer>İlerlemeniz bu cihazda saklanır · Set işaretleri her gün sıfırlanır</footer>
+        <footer>Bu uygulama tıbbi tavsiye değildir; kalp ritmi şikâyetleriniz için doktorunuza danışın.<br>İlerlemeniz bu cihazda saklanır · Set işaretleri her gün sıfırlanır</footer>
     </div>
 
     <!-- DİNLENME ZAMANLAYICISI -->
@@ -462,8 +538,9 @@
                 <h3>Aktivasyon <span>2-3 dk · Esnek lastikle</span></h3>
                 <p>Günün kaslarını harekete hazırlayın.</p>
                 <div class="moves">
-                    <div class="move"><b>Band Pull-Apart <small style="color:var(--faint)">(Çekiş)</small></b><span>15-20 tekrar</span></div>
-                    <div class="move"><b>Banded Omuz Isınması <small style="color:var(--faint)">(İtiş)</small></b><span>15 tekrar</span></div>
+                    <div class="move"><b>Band Pull-Apart</b><span>15-20 tekrar</span></div>
+                    <div class="move"><b>Banded Omuz Isınması</b><span>15 tekrar</span></div>
+                    <div class="move"><b>İlk harekete hafif ısınma seti</b><span>Hedef ağırlığın yarısıyla 10-12</span></div>
                 </div>
             </div>
             <p class="ready">Artık ana antrenmana hazırsınız!</p>
@@ -474,96 +551,98 @@
     <script>
         const yt = id => 'https://www.youtube.com/watch?v=' + id;
         const ys = id => 'https://www.youtube.com/shorts/' + id;
+        const ysearch = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
 
         const DAYS = [
             {
-                id: 'push', short: 'İtiş', title: 'Gün 1 · İtiş Günü', muscles: 'Göğüs · Omuz · Arka Kol',
-                weekday: 1, weekdayName: 'Pazartesi', color: '#fb923c',
+                id: 'fbA', short: 'A Günü', title: 'Gün A · Tüm Vücut', muscles: 'Bacak · Göğüs · Kanat · Yan Omuz · Arka Kol · Karın',
+                weekday: 1, weekdayName: 'Pazartesi', color: { light: '#ea580c', dark: '#fb923c' },
                 exercises: [
-                    { name: 'Dumbbell Bench Press', target: 'Göğüs', img: 'dumbellbench.jpg', video: ys('WbCEvFA0NJs'),
-                      sets: 3, reps: '8-12', heavy: true, backoff: '12-15', rest: 150,
-                      tip: "Ana göğüs hedefi. Son sette ağırlığı %20 düşürüp pump'a odaklanın.",
-                      alts: [['Bench Press', yt('_FkbD0FhgVE'), 'Daha ağır, güç odaklı'], ['Machine Chest Press', yt('Qu7-ceCvq7w'), 'Daha güvenli, izole', 'f2/Chest-Press-Machine.gif']] },
-                    { name: 'Seated Dumbbell Shoulder Press', target: 'Omuz', img: 'seatedshoulder.png', video: yt('k6tzKisR3NY'),
-                      sets: 3, reps: '8-12', rest: 120,
-                      tip: 'Geniş görünüm için. Sırtınızı sehpaya tam yaslayın. Dambılları çenenizin yanından başlatın.',
-                      alts: [['Machine Shoulder Press', yt('6v4nrRVySj0'), 'Daha güvenli, izole'], ['Barbell Overhead Press', yt('4LBVP2Oe7fg'), 'Fonksiyonel, tüm kor bölgesi', 'f1/overhead.gif']] },
-                    { name: 'Incline Dumbbell Press', target: 'Üst Göğüs', img: 'f1/Incline-Dumbbell-Press.gif', video: yt('8fXfwG4ftaQ'),
-                      sets: 3, reps: '10-15', rest: 90,
-                      tip: 'Göğüs üstünü doldurmak için. Dambılları köprücük kemiğinizin altına doğru indirin.',
-                      alts: [['Machine Press', yt('Qu7-ceCvq7w'), 'Daha güvenli, izole', 'f2/Chest-Press-Machine.gif'], ['Smith Machine Incline Press', yt('VXaBbUYMfIs'), 'Sabit yol, ağır kilo']] },
+                    { name: 'Leg Press', target: 'Bacak', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
+                      sets: 3, reps: '10-15', rest: 150,
+                      tip: 'Ayaklar omuz genişliğinde. İndirirken kalçanızın kalkmamasına dikkat edin, dizleri tam kilitlemeyin.',
+                      alts: [['Dumbbell Goblet Squat', ysearch('dumbbell goblet squat form'), 'Hafif dambılla, dengeli', 'Dumbbell-Goblet-Squat.gif'], ['Hack Squat Machine', ys('dJcCdRH_2i8'), 'Squat hissi, sırt destekli']] },
+                    { name: 'Machine Chest Press', target: 'Göğüs', img: 'f2/Chest-Press-Machine.gif', video: yt('Qu7-ceCvq7w'),
+                      sets: 3, reps: '10-12', rest: 120,
+                      tip: 'Sırtınızı sehpaya yaslayın, kürek kemiklerini hafifçe geriye toplayın. Makine yolu sabit olduğu için dengeyle uğraşmazsınız.',
+                      alts: [['Dumbbell Bench Press', ys('WbCEvFA0NJs'), 'Serbest ağırlık, orta kilo', 'dumbellbench.jpg']] },
+                    { name: 'Lat Pulldown', target: 'Kanat', img: 'f1/Lat-Pulldown.gif', video: yt('5s6KGLTMgoI'),
+                      sets: 3, reps: '10-12', rest: 120,
+                      tip: 'Barı göğsünüzün üstüne çekin, dirsekleri aşağı ve geriye götürün. Gövdeyi sallamayın.',
+                      alts: [['Neutral Grip Lat Pulldown', ysearch('neutral grip lat pulldown form'), 'Paralel tutuş, omuz dostu', 'f1/neutral Lat-Pulldown.gif']] },
                     { name: 'Dumbbell Lateral Raise', target: 'Yan Omuz', img: 'lateralraise.jpg', video: yt('Kl3LEzQ5Zqs'),
-                      sets: 3, reps: '12-15', rest: 75,
+                      sets: 2, reps: '12-15', rest: 120,
                       tip: 'Hafif ağırlık kullanın. Omuz hizasını geçmeyin. Hareketi yavaş ve kontrollü yapın.',
                       alts: [['Cable Lateral Raise', yt('9ilIKuy6B0g'), 'Sürekli gerginlik sağlar']] },
                     { name: 'Triceps Pushdown', target: 'Arka Kol · Kablo', img: 'f1/One-arm-triceps-pushdown.gif', video: yt('1FjkhpZsaxc'),
-                      sets: 3, reps: '12-15', rest: 75,
+                      sets: 2, reps: '12-15', rest: 120,
                       tip: 'Dirsekler yanda sabit kalsın. Sadece dirsekten bükün ve en altta 1 sn sıkıştırın.',
-                      alts: [['Dumbbell Kickbacks', yt('GZ3NzlJs_yg'), 'Serbest ağırlık, izole'], ['Close Grip Bench Press', yt('K3mFeNz4e3w'), 'Bileşik hareket, ağır kilo']] },
-                    { name: 'Overhead Triceps Extension', target: 'Arka Kol', img: 'f1/High-Pulley-Overhead-Tricep-Extension.gif', video: yt('oZ1MbUl-_-w'),
-                      sets: 3, reps: '12-15', rest: 75,
-                      tip: 'Arka kolun "uzun" başını hedefler. Dirseklerinizi başınıza yakın tutun. (Dumbbell veya kablo)',
-                      alts: [['Skullcrushers', yt('Mq9eoGIiCSU'), 'Barbell veya Dumbbell ile'], ['Machine Dips', yt('4ua3MzaU0QU'), 'Oturarak, güvenli']] }
+                      alts: [['Overhead Cable Extension', yt('oZ1MbUl-_-w'), 'Arka kolun uzun başı', 'f1/High-Pulley-Overhead-Tricep-Extension.gif']] },
+                    { name: 'Lying Leg Raise', target: 'Alt Karın', img: 'f1/lrase.gif', video: ys('ZyE4r7wiI6w'),
+                      sets: 2, reps: '10-15', rest: 120, noWeight: true,
+                      tip: 'Belinizi yere bastırın. Bacakları savurmadan, alt karınla yavaşça kaldırıp indirin. Zorlanırsanız dizleri bükün.',
+                      alts: [['Dead Bug', ysearch('dead bug exercise form'), 'En güvenli karın hareketi, bele yük yok']] }
                 ]
             },
             {
-                id: 'pull', short: 'Çekiş', title: 'Gün 2 · Çekiş Günü', muscles: 'Sırt · Pazu · Arka Omuz',
-                weekday: 3, weekdayName: 'Çarşamba', color: '#22d3ee',
+                id: 'fbB', short: 'B Günü', title: 'Gün B · Tüm Vücut', muscles: 'Bacak · Üst Göğüs · Sırt · Arka Omuz · Arka Bacak · Pazu',
+                weekday: 3, weekdayName: 'Çarşamba', color: { light: '#0e7490', dark: '#22d3ee' },
                 exercises: [
-                    { name: 'Lat Pulldown', target: 'Kanat', img: 'f1/Lat-Pulldown.gif', video: yt('5s6KGLTMgoI'),
-                      sets: 3, reps: '8-12', heavy: true, backoff: '12-15', rest: 150,
-                      tip: 'Ana sırt hareketi. Son sette ağırlığı %20 düşürüp kanatları tam sıkıştırmaya odaklanın.',
-                      alts: [['Pull-ups', yt('eDP_OOhMTZ4'), 'Vücut ağırlığı, daha zor']] },
+                    { name: 'Dumbbell Goblet Squat', target: 'Bacak · Kalça', img: 'Dumbbell-Goblet-Squat.gif', video: ysearch('dumbbell goblet squat form'),
+                      sets: 3, reps: '10-12', rest: 150,
+                      tip: 'Dambılı göğsünüze yakın tutun, gövde dik. Rahat inebildiğiniz derinliğe kadar inin; zorlamayın.',
+                      alts: [['Leg Press', ys('EotSw18oR9w'), 'Sırt destekli, daha güvenli', 'Leg-Press.gif']] },
+                    { name: 'Incline Dumbbell Press', target: 'Üst Göğüs', img: 'f1/Incline-Dumbbell-Press.gif', video: yt('8fXfwG4ftaQ'),
+                      sets: 3, reps: '10-12', rest: 120,
+                      tip: 'Sehpa 30° civarında olsun. Dambılları köprücük kemiğinizin altına doğru kontrollü indirin.',
+                      alts: [['Machine Chest Press', yt('Qu7-ceCvq7w'), 'Sabit yol, daha güvenli', 'f2/Chest-Press-Machine.gif']] },
                     { name: 'Seated Cable Row', target: 'Sırt Kalınlık', img: 'seatedcable.jpg', video: ys('LyZH4UGdDTc'),
                       sets: 3, reps: '10-12', rest: 120,
-                      tip: 'Belden değil, sırttan çekin. Çekiş anında omuzları geriye atıp kürek kemiklerini birleştirin.',
-                      alts: [['T-Bar Row', ys('8pR3JoZ0iBU'), 'Göğüs destekli veya serbest']] },
-                    { name: 'Single Arm Dumbbell Row', target: 'Tek Taraflı Sırt', img: 'singlearm.jpg', video: ys('yHqqGd0tXcw'),
-                      sets: 3, reps: '8-10 (her kol)', rest: 90,
-                      tip: 'Dambılı kalçanıza doğru çekin, vücudu döndürmeyin. Sırtı tam esnetip tam sıkıştırın.',
-                      alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Belinizi korur, daha izole', 'f1/dumbbell-chest-supported-row-exercise.gif'], ['Inverted Row', yt('KOaCM1HMwU0'), 'Vücut ağırlığı, fonksiyonel']] },
+                      tip: 'Belden değil, sırttan çekin. Çekiş anında kürek kemiklerini birleştirin, gövde sabit kalsın.',
+                      alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Göğüs destekli, beli korur', 'f1/dumbbell-chest-supported-row-exercise.gif']] },
                     { name: 'Face Pull', target: 'Arka Omuz · Kablo', img: 'f1/Face-Pull.gif', video: yt('IeOqdw9WI90'),
-                      sets: 3, reps: '15-20', rest: 60,
-                      tip: '(Athlean-X favorisi) Baş parmaklar geriyi gösterecek şekilde halatı çekin. Arka omuz ve duruş için kritik.',
-                      alts: [['Band Pull-Apart', ys('SuvO4TBwSu4'), 'Esnek lastik ile'], ['Reverse Pec Deck Machine', ys('-TKqxK7-ehc'), 'Makine, tam izole', 'f1/cable-rear-delt-fly.gif']] },
+                      sets: 2, reps: '15', rest: 120,
+                      tip: '(Athlean-X favorisi) Baş parmaklar geriyi gösterecek şekilde halatı yüzünüze çekin. Duruş ve omuz sağlığı için.',
+                      alts: [['Reverse Pec Deck / Cable Rear Delt Fly', ys('-TKqxK7-ehc'), 'Arka omuz, tam izole', 'f1/cable-rear-delt-fly.gif']] },
+                    { name: 'Lying Leg Curl', target: 'Arka Bacak', img: 'f1/LEG_CURL.gif', video: ys('FRy58-v0YII'),
+                      sets: 2, reps: '12-15', rest: 120,
+                      tip: 'Kalçanızı sehpaya bastırın. Topukları kalçaya çekerken sıkıştırın, yavaşça bırakın.',
+                      alts: [['Seated Leg Curl', ys('yJ_KpXrN8hs'), 'Oturarak, farklı açı']] },
                     { name: 'Dumbbell Biceps Curl', target: 'Pazu', img: 'f1/Flexor-Incline-Dumbbell-Curls.gif', video: ys('MKWBV29S6c0'),
-                      sets: 3, reps: '10-12', rest: 75,
-                      tip: 'Vücudu sallamayın (momentum yok). Hareketi indirirken (negatif) yavaş olun.',
-                      alts: [['Barbell Curl', ys('54x2WF1_Suc'), 'Daha ağır kilo', 'f2/Z-Bar-Curl.gif'], ['Preacher Curl Machine', ys('0y4tdUNPdlE'), 'Tam izole, sallanma yok', 'f1/ez-bar-preacher-curl-exercise.gif']] },
-                    { name: 'Hammer Curl', target: 'Pazu / Ön Kol', img: 'f1/Seated-Hammer-Curl.gif', video: ys('_aoad2yuP5w'),
-                      sets: 3, reps: '10-12', rest: 75,
-                      tip: 'Avuç içleri birbirine bakar. Pazu altındaki "brachialis" kasını hedefler, kolu daha kalın gösterir.',
-                      alts: [['Rope Hammer Curl', ys('p1XzMk3gsU0'), 'Kablo ile, sürekli gerginlik'], ['Cross-Body Hammer Curl', ys('qmQkt1Y-FX8'), 'Farklı açı, iyi sıkıştırma']] }
+                      sets: 2, reps: '10-12', rest: 120,
+                      tip: 'Vücudu sallamayın. Kaldırırken nefes verin, indirirken yavaş olun.',
+                      alts: [['Cable Biceps Curl', ysearch('cable biceps curl form'), 'Sürekli gerginlik', 'cablebicepscurl.gif'], ['Preacher Curl', ys('0y4tdUNPdlE'), 'Tam izole, sallanma yok', 'f1/ez-bar-preacher-curl-exercise.gif']] }
                 ]
             },
             {
-                id: 'legs', short: 'Bacak', title: 'Gün 3 · Bacak & Karın', muscles: 'Ön/Arka Bacak · Kalf · Karın',
-                weekday: 5, weekdayName: 'Cuma', color: '#a3e635',
+                id: 'fbC', short: 'C Günü', title: 'Gün C · Tüm Vücut', muscles: 'Ön Bacak · Kalça/Bel · Omuz · Sırt · Pazu · Kor',
+                weekday: 5, weekdayName: 'Cuma', color: { light: '#4d7c0f', dark: '#a3e635' },
                 exercises: [
-                    { name: 'Leg Press', target: 'Bacak · Ana Hareket', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
-                      sets: 3, reps: '10-15', rest: 150,
-                      tip: 'Güvenli alternatif. Ayaklar omuz genişliğinde. İndirirken kalçanızın kalkmamasına dikkat edin.',
-                      alts: [['Barbell Squat', ys('iKCJCydYYrE'), 'Riskli ama çok etkili, form şart', 'f1/BBSQ.gif'], ['Hack Squat Machine', ys('dJcCdRH_2i8'), 'Squat hissi, daha güvenli']] },
                     { name: 'Leg Extension', target: 'Ön Bacak', img: 'LEG-EXTENSION.gif', video: ys('iQ92TuvBqRo'),
-                      sets: 3, reps: '12-15', rest: 75,
-                      tip: 'Bacakları savurmayın. Hareketi yavaş ve kontrollü yapın. En tepede 1 saniye sıkıştırın.',
-                      alts: [['Dumbbell Lunges', ys('mJilHWIBWO8'), 'Bileşik hareket, denge ister']] },
-                    { name: 'Lying Leg Curl', target: 'Arka Bacak', img: 'f1/LEG_CURL.gif', video: ys('FRy58-v0YII'),
-                      sets: 3, reps: '12-15', rest: 75,
-                      tip: 'Kalçanızı sehpaya bastırın, kalkmasına izin vermeyin. Topuklarınızı kalçanıza çekerken tam sıkıştırın.',
-                      alts: [['Seated Leg Curl', ys('yJ_KpXrN8hs'), 'Oturarak, farklı açı'], ['Romanian Deadlift (Dumbbell)', yt('xAL7lHwj30E'), 'Esneklik ister']] },
-                    { name: 'Standing Calf Raises', target: 'Kalf', img: 'Standing-Calf-Raise.gif', video: ys('wdOkFomQNp8'),
-                      sets: 3, reps: '15-20', rest: 60,
-                      tip: 'Parmak ucunda 2 saniye bekleyin, yavaşça ve tam esneyerek inin. (Makinede yapmanız tercih edilir.)',
-                      alts: [['Seated Calf Raise', ys('ar8nav0jGoE'), 'Oturarak, farklı kası hedefler']] },
-                    { name: 'Reverse Crunch', target: 'Alt Karın', img: 'f1/lrase.gif', video: ys('ZyE4r7wiI6w'),
-                      sets: 3, reps: '15-20', rest: 45,
-                      tip: 'Bacaklarınızı savurmayın, alt karın kaslarınızı kullanarak kalçanızı yerden kaldırın.',
-                      alts: [['Hanging Leg Raises', ys('XQc0WHO90Lk'), 'Daha zordur, asılarak yapılır'], ['Ab Wheel Rollout', ys('kISuoI7QCYk'), 'Tüm kor bölgesini hedefler']] },
-                    { name: 'Plank', target: 'Tüm Kor', img: 'f2/Weighted-Front-Plank.gif', video: ys('xe2MXatLTUw'),
-                      sets: 3, reps: 'Maks. süre', rest: 45, noWeight: true,
-                      tip: 'Kalçanızı düşürmeyin veya çok kaldırmayın. Karın ve kalça kaslarınızı sıkarak düz bir çizgi oluşturun.',
-                      alts: [['Cable Crunches', ys('K2m0jj6RfYg'), 'Ağırlık takarak karın kasını büyütür', 'f2/Kneeling-Cable-Crunch.gif'], ['Russian Twists', ys('aRUMRbl7KS4'), 'Yan karın kaslarını hedefler']] }
+                      sets: 3, reps: '12-15', rest: 120,
+                      tip: 'Bacakları savurmayın. Yavaş kaldırın, en tepede 1 saniye sıkıştırın.',
+                      alts: [['Leg Press', ys('EotSw18oR9w'), 'Bileşik, sırt destekli', 'Leg-Press.gif']] },
+                    { name: 'Dumbbell Romanian Deadlift', target: 'Kalça · Arka Bacak · Bel', img: '', video: yt('xAL7lHwj30E'),
+                      sets: 2, reps: '10-12', rest: 150,
+                      tip: 'HAFİF dambıllarla. Dizler hafif bükük, kalçayı geriye iterek eğilin; sırt düz. Arka bacakta gerilme hissedince durun. 43 yaşında bel sağlığı için çok değerli.',
+                      alts: [['Glute Bridge', ysearch('glute bridge form'), 'Yerde, bele yük bindirmez'], ['Good Morning (sadece boş bar)', ysearch('barbell good morning form'), 'Çok hafif yapılmalı', 'Barbell-Good-Morning.gif']] },
+                    { name: 'Seated Dumbbell Shoulder Press', target: 'Omuz', img: 'seatedshoulder.png', video: yt('k6tzKisR3NY'),
+                      sets: 2, reps: '10-12', rest: 120,
+                      tip: 'Sırt mutlaka destekli olsun, ORTA ağırlık. Baş üstü itiş tansiyonu en çok yükselten harekettir: zorlanırsanız makineye geçin.',
+                      alts: [['Machine Shoulder Press', yt('6v4nrRVySj0'), 'Önerilen: daha güvenli, sabit yol']] },
+                    { name: 'Single Arm Dumbbell Row', target: 'Sırt', img: 'singlearm.jpg', video: ys('yHqqGd0tXcw'),
+                      sets: 3, reps: '10-12 (her kol)', rest: 120,
+                      tip: 'Elinizi ve dizinizi sehpaya dayayın. Dambılı kalçanıza doğru çekin, vücudu döndürmeyin.',
+                      alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Göğüs destekli, beli korur', 'f1/dumbbell-chest-supported-row-exercise.gif']] },
+                    { name: 'Hammer Curl', target: 'Pazu / Ön Kol', img: 'f1/Seated-Hammer-Curl.gif', video: ys('_aoad2yuP5w'),
+                      sets: 2, reps: '10-12', rest: 120,
+                      tip: 'Avuç içleri birbirine bakar. Oturarak yapmak sallanmayı önler.',
+                      alts: [['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
+                    { name: 'Plank (kısa süreli)', target: 'Tüm Kor', img: 'f2/Weighted-Front-Plank.gif', video: ys('xe2MXatLTUw'),
+                      sets: 3, reps: '20-30 sn', rest: 120, noWeight: true,
+                      breath: 'Nefesi tutmayın! Plank boyunca sakin ve düzenli nefes alıp verin. Ağırlık koymadan yapın.',
+                      tip: 'Kalça düşmesin, çok da kalkmasın; karın ve kalçayı sıkarak düz bir çizgi oluşturun. Uzun tutmak yerine kısa ve kaliteli.',
+                      alts: [['Kneeling Cable Crunch', ys('K2m0jj6RfYg'), 'Hafif ağırlıkla, kontrollü', 'f2/Kneeling-Cable-Crunch.gif'], ['Dead Bug', ysearch('dead bug exercise form'), 'Bele yük yok']] }
                 ]
             }
         ];
@@ -577,6 +656,7 @@
             clock: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>',
             reps: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>',
             chevron: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>',
+            wind: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/></svg>',
             reset: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/></svg>'
         };
 
@@ -586,6 +666,27 @@
             set(k, v) { try { localStorage.setItem('idman:' + k, JSON.stringify(v)); } catch (e) {} }
         };
         const todayKey = () => new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
+
+        // --- Tema (açık / koyu) ---
+        const theme = () => document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const dayColor = d => d.color[theme()];
+        const themeBtn = document.getElementById('themeBtn');
+        const SUN = '<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>';
+        const MOON = '<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>';
+        function paintThemeBtn() {
+            // Düğme, geçilecek temanın simgesini gösterir
+            themeBtn.innerHTML = theme() === 'dark' ? SUN : MOON;
+            themeBtn.setAttribute('aria-label', theme() === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç');
+        }
+        themeBtn.addEventListener('click', () => {
+            const next = theme() === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            document.querySelector('meta[name="theme-color"]').content = next === 'dark' ? '#030712' : '#f3f5f9';
+            store.set('theme', next);
+            paintThemeBtn();
+            render();
+        });
+        paintThemeBtn();
 
         // Set işaretleri sadece o gün için geçerli; ertesi gün otomatik sıfırlanır.
         function getDone(dayId) {
@@ -618,7 +719,7 @@
         function renderTabs() {
             tabsEl.innerHTML = DAYS.map(d => {
                 const pct = Math.round(getDone(d.id).size / totalSets(d) * 100);
-                return `<button class="tab" role="tab" style="--c:${d.color}" data-id="${d.id}" aria-selected="${d.id === activeId}">
+                return `<button class="tab" role="tab" style="--c:${dayColor(d)}" data-id="${d.id}" aria-selected="${d.id === activeId}">
                     ${todayDay && todayDay.id === d.id ? '<span class="t-today" title="Bugün"></span>' : ''}
                     <span class="t-day">${d.weekdayName}</span>
                     <span class="t-name">${d.short}</span>
@@ -641,8 +742,8 @@
         function render() {
             const day = DAYS.find(d => d.id === activeId);
             const done = getDone(day.id);
-            document.documentElement.style.setProperty('--accent', day.color);
-            document.documentElement.style.setProperty('--accent-soft', day.color + '24');
+            document.documentElement.style.setProperty('--accent', dayColor(day));
+            document.documentElement.style.setProperty('--accent-soft', dayColor(day) + (theme() === 'dark' ? '24' : '1c'));
             renderTabs();
 
             const lastDone = store.get('last:' + day.id, null);
@@ -679,7 +780,9 @@
             return `
             <article class="ex${allDone ? ' done' : ''}" data-i="${i}">
                 <a class="ex-media" href="${ex.video}" target="_blank" rel="noopener noreferrer" aria-label="${esc(ex.name)} videosunu izle">
-                    <img src="${esc(ex.img)}" alt="${esc(ex.name)}" loading="lazy"${/\.gif$/i.test(ex.img) ? ' class="gif"' : ''}>
+                    ${ex.img
+                        ? `<img src="${esc(ex.img)}" alt="${esc(ex.name)}" loading="lazy"${/\.gif$/i.test(ex.img) ? ' class="gif"' : ''}>`
+                        : `<span class="no-img">${ICON.play}<small>Videoda izle</small></span>`}
                     <span class="ex-num">${i + 1}</span>
                     <span class="play">${ICON.play} Video</span>
                     <span class="done-badge"><span>${ICON.check}</span></span>
@@ -692,9 +795,11 @@
                     <div class="meta-row">
                         <span class="meta sets">${ICON.reps} ${ex.sets} × ${esc(ex.reps)}${ex.heavy ? ' (Ağır)' : ''}</span>
                         ${ex.backoff ? `<span class="meta backoff">+1 × ${ex.backoff} back-off</span>` : ''}
+                        <span class="meta rir" title="Her sette 2-3 tekrar daha yapabilecekken durun">2-3 tekrar yedekte</span>
                         <button class="meta rest" data-rest="${ex.rest}" title="Dinlenme sayacını başlat">${ICON.clock} ${fmtRest(ex.rest)}</button>
                     </div>
                     <p class="tip">${esc(ex.tip)}</p>
+                    <p class="breath">${ICON.wind} ${esc(ex.breath || 'Kaldırırken / iterken nefes verin, indirirken nefes alın. Nefesi tutmayın.')}</p>
                     <div class="tracker">
                         <div class="set-btns">
                             ${sets.map(s => `<button class="set-btn${s === 'B' ? ' bo' : ''}" data-set="${s}" aria-pressed="${done.has(`${i}-${s}`)}" title="${s === 'B' ? 'Back-off set' : s + '. set'}">${s === 'B' ? 'B-off' : s}</button>`).join('')}
@@ -801,8 +906,9 @@
                 if (left === 0) {
                     clearInterval(tick); tick = null;
                     el.classList.add('finished');
-                    stateEl.textContent = 'Süre doldu!';
-                    timeEl.textContent = 'Hadi!';
+                    // Acele ettirmeyen bir dil: nabız sakinleşmeden başlamamak esas
+                    stateEl.textContent = 'Nefesiniz ve nabzınız sakinse devam edin';
+                    timeEl.textContent = 'Hazır';
                     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                     beep();
                     hideT = setTimeout(stop, 6000);
@@ -819,7 +925,11 @@
                 tick = setInterval(update, 250);
             }
             function adjust(d) {
-                if (!tick) return;
+                if (!tick) {
+                    // Süre bitmişken +15: "henüz hazır değilim" → kısa bir ek dinlenme başlat
+                    if (d > 0 && el.classList.contains('show')) start(d, nameEl.textContent);
+                    return;
+                }
                 end += d * 1000; total = Math.max(total + d, 1);
                 update();
             }
