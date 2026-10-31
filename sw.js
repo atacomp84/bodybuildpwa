@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v9'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+const CACHE_NAME = 'idman-app-v10'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
 // Ana dosyalar
 const urlsToCache = [
   './',
@@ -70,20 +70,8 @@ self.addEventListener('install', event => {
            }
          }
       }
-
-      // Resimleri önbelleğe al
-      // Resimlerin yüklenmesi install'u başarısız kılmasın, o yüzden tek tek deniyoruz.
-      console.log('Resimler önbelleğe alınıyor...');
-      for (const url of imageUrls) {
-        try {
-          // cache.add() dosyayı fetch edip cache'e atar
-          await cache.add(fresh(url));
-        } catch (err) {
-          // Bir resim başarısız olursa sadece uyar, kuruluma devam et
-          console.warn(`Resim önbelleğe alınamadı (sorun değil, devam ediliyor): ${url}`, err);
-        }
-      }
-      console.log('Tüm varlıklar önbelleğe alındı.');
+      // Resimler (~5 MB) burada BEKLENMEZ: kurulum uzarsa ve uygulama kapanırsa güncelleme yarıda kalıyordu.
+      // Resimler 'activate' sonrasında arka planda iner; görüntülenenler zaten fetch sırasında önbelleğe girer.
     })()
   );
   // Yeni service worker'ın eskisiyle çakışmadan hemen aktif olmasını sağla
@@ -163,7 +151,20 @@ self.addEventListener('activate', event => {
         })
       );
       // Aktif service worker'ın sayfayı hemen kontrol etmesini sağla
-      return self.clients.claim();
+      await self.clients.claim();
     })()
   );
+  // Resimleri arka planda önbelleğe al (çevrimdışı kullanım için); etkinleşmeyi geciktirmez
+  precacheImages();
 });
+
+async function precacheImages() {
+  const cache = await caches.open(CACHE_NAME);
+  for (const url of imageUrls) {
+    try {
+      if (!(await cache.match(url))) await cache.add(new Request(url, { cache: 'reload' }));
+    } catch (err) {
+      console.warn(`Resim önbelleğe alınamadı (sorun değil): ${url}`, err);
+    }
+  }
+}
