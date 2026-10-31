@@ -1,35 +1,35 @@
-const CACHE_NAME = 'idman-app-v4'; // Hareket GIF'leri eklendi
+const CACHE_NAME = 'idman-app-v6'; // Kare ikonlar, kullanılmayan görseller çıkarıldı
 // Ana dosyalar
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './logo.png',
+  './favicon.ico',
   './icons/icon-192x192.png',
-  './icons/icon-512x512.png'
+  './icons/icon-512x512.png',
+  './icons/icon-maskable-512x512.png',
+  './icons/apple-touch-icon.png'
 ];
 
 // Uygulamada kullanılan egzersiz resimleri
 const imageUrls = [
+    // GIF'i olmayan hareketlerin fotoğrafları
     './dumbellbench.jpg',
     './seatedshoulder.png',
-    './incline dumbell.jpg',
     './lateralraise.jpg',
-    './tricepspush.jpg',
-    './overheadextension.jpg',
-    './latpulldown.jpg',
     './seatedcable.jpg',
     './singlearm.jpg',
-    './facepull.jpg',
-    './bicepcurl.jpg',
-    './hummercurl.jpg',
-    './leggpress.jpg',
-    './legext.jpg',
-    './lyingleg.jpg',
-    './calfraise.jpg',
-    './reversecrunch.jpg',
-    './plank.jpg',
     './runninng.jpg',
+    // Muadil GIF'leri
+    './f2/Chest-Press-Machine.gif',
+    './f1/overhead.gif',
+    './f1/dumbbell-chest-supported-row-exercise.gif',
+    './f1/cable-rear-delt-fly.gif',
+    './f2/Z-Bar-Curl.gif',
+    './f1/ez-bar-preacher-curl-exercise.gif',
+    './f1/BBSQ.gif',
+    './f2/Kneeling-Cable-Crunch.gif',
     // Hareket GIF'leri
     './f1/Incline-Dumbbell-Press.gif',
     './f1/One-arm-triceps-pushdown.gif',
@@ -55,14 +55,16 @@ self.addEventListener('install', event => {
       
       // Ana dosyaları ekle
       // addAll atomiktir, biri bile başarısız olursa hepsi başarısız olur.
+      // cache: 'reload' → tarayıcının HTTP önbelleğini atla; yoksa yeni sürüm eski dosyalarla kurulabilir
+      const fresh = url => new Request(url, { cache: 'reload' });
       try {
-        await cache.addAll(urlsToCache);
+        await cache.addAll(urlsToCache.map(fresh));
       } catch (err) {
          console.warn('Ana dosyalar addAll ile önbelleğe alınamadı, tek tek deneniyor...', err);
          // addAll başarısız olursa tek tek dene
          for (const url of urlsToCache) {
            try {
-             await cache.add(url);
+             await cache.add(fresh(url));
            } catch (addErr) {
              console.warn(`Install: Ana kaynak önbelleğe alınamadı: ${url}`, addErr);
            }
@@ -75,7 +77,7 @@ self.addEventListener('install', event => {
       for (const url of imageUrls) {
         try {
           // cache.add() dosyayı fetch edip cache'e atar
-          await cache.add(url);
+          await cache.add(fresh(url));
         } catch (err) {
           // Bir resim başarısız olursa sadece uyar, kuruluma devam et
           console.warn(`Resim önbelleğe alınamadı (sorun değil, devam ediliyor): ${url}`, err);
@@ -137,8 +139,11 @@ self.addEventListener('fetch', event => {
       } catch (error) {
         // Ağ hatası. Önbellekte de yoktu.
         console.warn('Ağ hatası, kaynak getirilemedi ve önbellekte de yok:', event.request.url, error);
-        // İsteğe bağlı olarak burada 'çevrimdışı' bir sayfa döndürebiliriz.
-        // return caches.match('./offline.html');
+        // Boş yanıt (undefined) tarayıcıda ERR_FAILED hatasına yol açar; anlamlı bir 503 döndür
+        return new Response('Çevrimdışı: kaynak önbellekte yok', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
       }
     })()
   );
