@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Bölgesel Vücut Geliştirme Planı</title>
     <link rel="icon" href="logo.png" type="image/x-icon">
     <link rel="manifest" href="./manifest.json">
@@ -10,1038 +10,882 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="İdman">
-        <link rel="apple-touch-icon" href="icons/apple-touch-icon.svg">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.svg">
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful');
-            })
-            .catch(err => {
-              console.log('ServiceWorker registration failed: ', err);
-            });
+            .then(() => console.log('ServiceWorker registration successful'))
+            .catch(err => console.log('ServiceWorker registration failed: ', err));
         });
       }
     </script>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #030712;
+            --surface: #0d1321;
+            --surface-2: #151d2e;
+            --surface-3: #1e293b;
+            --border: #243045;
+            --text: #f9fafb;
+            --muted: #94a3b8;
+            --faint: #64748b;
+            --yellow: #fde047;
+            --green: #4ade80;
+            --accent: #22d3ee;      /* aktif güne göre JS ile değişir */
+            --accent-soft: rgba(34, 211, 238, .14);
+            --radius: 16px;
+        }
+        * { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #030712; /* Daha Koyu Bir Arka Plan */
-            color: #f9fafb; /* gray-50 */
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(1200px 500px at 50% -200px, var(--accent-soft), transparent 70%);
+            background-repeat: no-repeat;
+            color: var(--text);
+            line-height: 1.5;
+            transition: background-image .4s;
+        }
+        a { color: inherit; }
+        button { font: inherit; color: inherit; cursor: pointer; }
+        svg { flex-shrink: 0; }
+        .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+
+        /* --- ÜST BAŞLIK --- */
+        .hero { display: flex; align-items: center; gap: 16px; padding: 28px 0 20px; }
+        .hero img { width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 6px 18px rgba(34,211,238,.25)); }
+        .hero h1 { margin: 0; font-size: clamp(1.4rem, 4.5vw, 2rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+        .hero p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
+        @media (max-width: 480px) { .hero img { width: 54px; height: 54px; } .hero { gap: 12px; } }
+        .today-pill {
+            display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+            padding: 4px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600;
+            background: var(--accent-soft); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
         }
 
-        @keyframes floatAndBlink {
-            0% { transform: translateX(-2px); opacity: 0.6; }
-            25% { transform: translateX(2px); opacity: 0.8; }
-            50% { transform: translateX(-2px); opacity: 1; }
-            75% { transform: translateX(2px); opacity: 0.8; }
-            100% { transform: translateX(-2px); opacity: 0.6; }
+        /* --- ÖZET KUTULARI --- */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+        .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
+        .stat b { display: block; font-size: 1.35rem; font-weight: 800; }
+        .stat span { font-size: .75rem; color: var(--muted); }
+
+        .warmup-btn {
+            width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
+            padding: 14px 16px; border-radius: var(--radius); border: 1px solid rgba(253,224,71,.35);
+            background: linear-gradient(135deg, rgba(253,224,71,.14), rgba(251,146,60,.10));
+            transition: transform .15s, border-color .15s;
+        }
+        .warmup-btn:hover { transform: translateY(-2px); border-color: rgba(253,224,71,.6); }
+        .warmup-btn .ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: rgba(253,224,71,.18); color: var(--yellow); }
+        .warmup-btn b { display: block; font-size: 1rem; }
+        .warmup-btn small { color: var(--muted); font-size: .8rem; }
+        .warmup-btn .tag { margin-left: auto; font-size: .7rem; font-weight: 700; color: #111; background: var(--yellow); padding: 3px 8px; border-radius: 999px; }
+
+        /* --- GÜN SEKMELERİ --- */
+        .tabs-bar {
+            position: sticky; top: 0; z-index: 50; margin: 22px -16px 0; padding: 10px 16px;
+            background: rgba(3,7,18,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .tab {
+            position: relative; overflow: hidden; padding: 10px 8px; border-radius: 12px; text-align: center;
+            background: var(--surface); border: 1px solid var(--border); transition: border-color .2s, background .2s;
+        }
+        .tab .t-day { display: block; font-size: .68rem; color: var(--faint); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+        .tab .t-name { display: block; font-weight: 700; font-size: .95rem; }
+        .tab .t-bar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--c); width: 0; transition: width .4s; }
+        .tab[aria-selected="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, var(--surface)); }
+        .tab[aria-selected="true"] .t-name { color: var(--c); }
+        .tab .t-today { position: absolute; top: 5px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 30%, transparent); }
+
+        /* --- GÜN BAŞLIĞI --- */
+        .day-head {
+            margin: 18px 0 14px; padding: 18px; border-radius: var(--radius);
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, var(--surface)), var(--surface));
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+        }
+        .day-head-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .day-head h2 { margin: 0; font-size: 1.45rem; font-weight: 800; letter-spacing: -.01em; }
+        .day-head .muscles { color: var(--muted); font-size: .9rem; margin-top: 2px; }
+        .ring { width: 64px; height: 64px; position: relative; flex-shrink: 0; }
+        .ring svg { transform: rotate(-90deg); }
+        .ring .ring-txt { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: .95rem; }
+        .day-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; font-size: .82rem; color: var(--muted); flex-wrap: wrap; }
+        .ghost-btn { background: transparent; border: 1px solid var(--border); border-radius: 10px; padding: 6px 12px; font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+        .ghost-btn:hover { color: var(--text); border-color: var(--faint); }
+
+        /* --- HAREKET KARTI --- */
+        .ex-list { display: grid; gap: 14px; }
+        .ex {
+            display: flex; flex-direction: column; overflow: hidden;
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            transition: border-color .25s, transform .2s, box-shadow .2s;
+        }
+        .ex:hover { box-shadow: 0 12px 30px -12px rgba(0,0,0,.6); }
+        .ex.done { border-color: color-mix(in srgb, var(--green) 55%, var(--border)); }
+        .ex-media { position: relative; display: block; height: 190px; background: var(--surface-3); flex-shrink: 0; }
+        .ex-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s, filter .25s; }
+        .ex-media:hover img { transform: scale(1.04); }
+        /* Animasyonlu GIF'ler beyaz zeminli: kırpmadan tamamını göster */
+        .ex-media:has(img.gif) { background: #fff; }
+        .ex-media img.gif { object-fit: contain; padding: 6px; }
+        .ex-media:hover img.gif { transform: none; }
+        .ex.done .ex-media img { filter: grayscale(.6) brightness(.6); }
+        .ex-num {
+            position: absolute; top: 10px; left: 10px; width: 32px; height: 32px; border-radius: 10px;
+            display: grid; place-items: center; font-weight: 800; font-size: .95rem;
+            background: var(--accent); color: #0b0f19; box-shadow: 0 4px 12px rgba(0,0,0,.4);
+        }
+        .ex.done .ex-num { background: var(--green); }
+        .play {
+            position: absolute; right: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 11px; border-radius: 999px; font-size: .78rem; font-weight: 700;
+            background: rgba(3,7,18,.78); backdrop-filter: blur(6px); color: #fff; border: 1px solid rgba(255,255,255,.15);
+        }
+        .play svg { color: #ef4444; }
+        .done-badge { position: absolute; inset: 0; display: none; place-items: center; }
+        .done-badge span { width: 54px; height: 54px; border-radius: 50%; background: var(--green); color: #052e16; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(74,222,128,.35); }
+        .ex.done .done-badge { display: grid; }
+
+        .ex-body { padding: 14px 16px 16px; flex: 1; min-width: 0; }
+        .ex-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+        .ex-head h3 { margin: 0; font-size: 1.08rem; font-weight: 700; line-height: 1.3; }
+        .ex-head h3 a { text-decoration: none; }
+        .ex-head h3 a:hover { color: var(--accent); }
+        .target { flex-shrink: 0; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+
+        .meta-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .meta {
+            display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; font-weight: 600;
+            padding: 5px 9px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border);
+        }
+        .meta.sets { color: var(--yellow); }
+        .meta.backoff { color: #fdba74; }
+        button.meta.rest { color: var(--muted); }
+        button.meta.rest:hover { color: var(--text); border-color: var(--faint); }
+        .tip { margin: 10px 0 0; font-size: .86rem; color: var(--muted); }
+
+        .tracker { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
+        .set-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+        .set-btn {
+            min-width: 40px; height: 40px; padding: 0 8px; border-radius: 10px; font-weight: 700; font-size: .85rem;
+            background: var(--surface-2); border: 1.5px solid var(--border); color: var(--muted);
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            transition: background .15s, border-color .15s, color .15s, transform .1s;
+        }
+        .set-btn:hover { border-color: var(--accent); color: var(--text); }
+        .set-btn:active { transform: scale(.94); }
+        .set-btn.bo { border-style: dashed; }
+        .set-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #0b0f19; }
+        .ex.done .set-btn[aria-pressed="true"] { background: var(--green); border-color: var(--green); }
+        .weight { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); margin-left: auto; }
+        .weight input {
+            width: 72px; height: 40px; border-radius: 10px; padding: 0 10px; text-align: center;
+            background: var(--surface-2); border: 1.5px solid var(--border); color: var(--text); font: inherit; font-weight: 700; font-size: .95rem;
+        }
+        .weight input:focus { outline: none; border-color: var(--accent); }
+
+        details.alts { margin-top: 12px; }
+        details.alts summary {
+            list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+            font-size: .8rem; font-weight: 600; color: var(--accent);
+        }
+        details.alts summary::-webkit-details-marker { display: none; }
+        details.alts summary svg { transition: transform .2s; }
+        details.alts[open] summary svg { transform: rotate(90deg); }
+        .alt-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+        .alt-list a {
+            display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; text-decoration: none;
+            background: var(--surface-2); border: 1px solid var(--border); font-size: .85rem; transition: border-color .15s;
+        }
+        .alt-list a:hover { border-color: var(--accent); }
+        .alt-list a b { font-weight: 600; }
+        .alt-list .alt-gif { width: 56px; height: 56px; border-radius: 8px; object-fit: contain; background: #fff; flex-shrink: 0; }
+        .alt-list a small { color: var(--faint); }
+        .alt-list a svg { margin-left: auto; color: #ef4444; }
+
+        @media (min-width: 720px) {
+            .ex { flex-direction: row; }
+            .ex-media { width: 230px; height: auto; min-height: 100%; }
         }
 
-        .video-text {
-            font-size: 0.75rem;
-            color: #22d3ee;
-            display: inline-block;
-            font-weight: normal;
-            margin-left: 0; /* hemen yanına gelmesi için boşluk kaldırıldı */
-            animation: floatAndBlink 2s ease-in-out infinite;
-        }
+        /* --- REHBER BÖLÜMÜ --- */
+        .section-title { display: flex; align-items: center; gap: 10px; margin: 36px 0 14px; font-size: 1.2rem; font-weight: 800; }
+        .section-title svg { color: var(--accent); }
+        .guide { display: grid; gap: 12px; }
+        @media (min-width: 720px) { .guide { grid-template-columns: 1fr 1fr; } }
+        .g-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+        .g-card h3 { margin: 0 0 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .g-card h3 svg { color: var(--accent); }
+        .g-card p { margin: 0 0 8px; font-size: .86rem; color: var(--muted); }
+        .g-card strong { color: var(--text); }
+        .hl { color: var(--yellow) !important; }
+        .rest-rows { display: grid; gap: 6px; }
+        .rest-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); font-size: .85rem; }
+        .rest-row b { color: var(--yellow); }
+        .steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+        .steps li { display: flex; gap: 10px; font-size: .86rem; color: var(--muted); }
+        .steps li i { font-style: normal; flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; font-weight: 800; background: var(--accent-soft); color: var(--accent); }
+        .cardio { display: flex; gap: 14px; align-items: center; }
+        .cardio img { width: 84px; height: 84px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+        .notes { display: grid; gap: 10px; }
+        .note { display: flex; gap: 10px; font-size: .86rem; color: var(--muted); }
+        .note .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); margin-top: 7px; flex-shrink: 0; }
+        footer { text-align: center; color: var(--faint); font-size: .75rem; padding: 32px 0 120px; }
 
-        /* Tüm YouTube linklerine hover efekti */
-        a[href*="youtube"] {
-            transition: color 0.2s ease-in-out;
+        /* --- DİNLENME ZAMANLAYICISI --- */
+        .timer {
+            position: fixed; left: 50%; bottom: 16px; z-index: 900; width: min(520px, calc(100% - 24px));
+            transform: translate(-50%, 150%); transition: transform .35s cubic-bezier(.2,.9,.3,1.2);
+            background: rgba(13,19,33,.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border); border-radius: 18px; padding: 12px 14px 14px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,.8);
+            margin-bottom: env(safe-area-inset-bottom);
         }
-        
-        a[href*="youtube"]:hover {
-            color: #67e8f9 !important; /* Açık cyan */
-            text-decoration: none;
-        }
+        .timer.show { transform: translate(-50%, 0); }
+        .timer-row { display: flex; align-items: center; gap: 12px; }
+        .timer-time { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; min-width: 92px; }
+        .timer-label { flex: 1; min-width: 0; font-size: .78rem; color: var(--muted); }
+        .timer-label b { display: block; color: var(--text); font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .timer-btns { display: flex; gap: 6px; }
+        .timer-btns button { height: 38px; min-width: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); font-weight: 700; font-size: .8rem; }
+        .timer-btns button.primary { background: var(--accent); color: #0b0f19; border-color: var(--accent); }
+        .timer-track { height: 4px; border-radius: 4px; background: var(--surface-3); margin-top: 10px; overflow: hidden; }
+        .timer-fill { height: 100%; background: var(--accent); width: 100%; transition: width .25s linear; }
+        .timer.finished { border-color: var(--green); }
+        .timer.finished .timer-time { color: var(--green); }
+        .timer.finished .timer-fill { background: var(--green); }
 
-        /* Strong içindeki linkler için de geçerli olsun */
-        strong a[href*="youtube"]:hover {
-            color: #67e8f9 !important;
-        }
-        .details-box {
-            background-color: #1f2937; /* gray-800 */
-        }
-        .card-header-icon {
-            width: 28px;
-            height: 28px;
-            color: #22d3ee; /* cyan-400 */
-        }
-        /* Tıklanabilir Kartlar (<a> tagı) */
-        .exercise-card {
-            background-color: #111827; /* gray-900 */
-            border: 1px solid #374151; /* gray-700 */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s;
-        }
-        .exercise-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.08);
-            background-color: #1f2937; /* gray-800 hover */
-        }
-        .exercise-image {
-            width: 100%; /* Mobilde tam genişlik */
-            height: 96px; /* Yüksekliği sabitledik */
-            object-fit: cover;
-            border-radius: 0.5rem;
-            flex-shrink: 0;
-            background-color: #334155; /* Placeholder arka planı */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
-            color: #e2e8f0;
-            text-align: center;
-            overflow: hidden; /* Resmin kenarlarını düzgün göstermek için */
-        }
-        .exercise-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Resmi kutuya sığdırır */
-        }
-        @media (min-width: 768px) { /* md breakpoint */
-            .exercise-image {
-                width: 144px; /* 9rem (md:w-36) */
-                height: 96px; /* 6rem (md:h-24) */
-            }
-        }
-        
-        /* MUADİL KUTUSU STİLİ */
-        .muadiller-box {
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 1px solid #374151; /* gray-700 */
-        }
-
-        /* --- MODAL STİLLERİ --- */
+        /* --- MODALLAR --- */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.8); 
+            display: none; position: fixed; inset: 0; z-index: 1000; overflow-y: auto;
+            background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
+            padding: 16px; align-items: flex-start; justify-content: center;
         }
-        .modal-content {
-            background-color: #1f2937; 
-            margin: 5% auto; 
-            padding: 24px;
-            border: 1px solid #4B5563; 
-            width: 90%; 
-            max-width: 700px; 
-            border-radius: 12px;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        .modal.open { display: flex; }
+        .sheet {
+            position: relative; width: 100%; max-width: 640px; margin: auto;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.6); animation: pop .25s ease-out;
         }
-        .modal-close {
-            color: #9CA3AF; 
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 32px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        .modal-close:hover,
-        .modal-close:focus {
-            color: #ffffff;
-            text-decoration: none;
-        }
-        
-        /* --- ACCORDION STİLLERİ --- */
-        .accordion-button {
-            transition: background-color 0.3s ease;
-        }
-        .accordion-button:hover {
-            background-color: #1f2937; /* gray-800 hover */
-        }
-        .accordion-icon {
-            transition: transform 0.3s ease;
-            flex-shrink: 0;
-        }
-        .accordion-button.active .accordion-icon {
-            transform: rotate(180deg);
-        }
-        .accordion-panel {
-            display: none; /* Varsayılan olarak gizli */
-            overflow: hidden;
-            background-color: #1f2937; /* gray-800 */
-        }
+        @keyframes pop { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+        .sheet-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
+        .sheet-close:hover { color: var(--text); }
+        .sheet h2 { margin: 0 40px 4px 0; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .sheet h2 svg { color: var(--yellow); }
+        .sheet .lead { color: var(--muted); font-size: .88rem; margin: 0 0 18px; }
+        .phase { position: relative; padding-left: 34px; padding-bottom: 18px; }
+        .phase:not(:last-of-type)::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: 0; width: 2px; background: var(--border); }
+        .phase-num { position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .85rem; background: var(--yellow); color: #111; }
+        .phase h3 { margin: 2px 0 2px; font-size: 1rem; }
+        .phase h3 span { color: var(--yellow); font-weight: 600; font-size: .82rem; margin-left: 4px; }
+        .phase p { margin: 0 0 10px; color: var(--muted); font-size: .84rem; }
+        .moves { display: grid; gap: 8px; }
+        @media (min-width: 560px) { .moves { grid-template-columns: 1fr 1fr; } }
+        .move { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); font-size: .86rem; }
+        .move b { font-weight: 600; }
+        .move span { color: var(--yellow); font-weight: 700; font-size: .78rem; text-align: right; }
+        .ready { text-align: center; color: var(--green); font-weight: 700; margin: 6px 0 0; }
 
-        /* --- YENİ EKLENEN PWA YÜKLEME MODALI STİLLERİ --- */
-        #installPwaModal {
-            display: none; /* JS ile 'flex' yapılacak */
-            position: fixed; 
-            z-index: 2000; /* Diğer modalın üstünde */
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.85); 
-            /* İçeriği ortalamak için flex kullanıyoruz */
-            justify-content: center;
-            align-items: center;
-        }
-        .install-modal-content {
-            background-color: #1f2937; /* gray-800 */
-            margin: auto; 
-            padding: 24px;
-            border: 1px solid #4B5563; /* gray-600 */
-            width: 90%; 
-            max-width: 450px; /* Daha küçük bir modal */
-            border-radius: 12px;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            text-align: center;
-        }
+        #installPwaModal { z-index: 2000; align-items: center; }
+        .install-sheet { max-width: 420px; text-align: center; }
+        .install-sheet img { width: 80px; height: 80px; margin: 0 auto 12px; display: block; }
+        .install-sheet h2 { justify-content: center; margin: 0 0 8px; color: var(--accent); }
+        .install-sheet p { color: var(--muted); margin: 0 0 20px; font-size: .92rem; }
+        .btn-row { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 12px 14px; border-radius: 12px; font-weight: 700; border: 1px solid var(--border); background: var(--surface-3); }
+        .btn.primary { background: var(--accent); color: #0b0f19; border-color: var(--accent); }
 
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition: none !important; animation: none !important; }
+        }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100">
+<body>
 
-    <div class="container mx-auto max-w-4xl p-4 md:p-8">
-        
+    <div class="wrap">
         <!-- Başlık -->
-        <header class="text-center mb-10">
-            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">
-                Bölgesel Vücut Geliştirme Planı <img src="logo.png" alt="Logo" class="inline-block w-15 h-15 align-middle">
-            </h1>
-            
+        <header class="hero">
+            <img src="logo.png" alt="Logo">
+            <div>
+                <h1>Bölgesel Vücut Geliştirme Planı</h1>
+                <p>Haftada 3 gün · İtiş / Çekiş / Bacak (PPL)</p>
+                <span class="today-pill" id="todayPill"></span>
+            </div>
         </header>
 
-        <!-- BÖLÜM 0: PROGRAM ANALİZİ (GÜNCELLENDİ) -->
-        
+        <!-- Özet -->
+        <div class="stats">
+            <div class="stat"><b>3</b><span>gün / hafta</span></div>
+            <div class="stat"><b>18</b><span>hareket</span></div>
+            <div class="stat"><b>60 dk</b><span>yürüyüş / gün</span></div>
+        </div>
 
-        <!-- BÖLÜM 1: ANTRENMAN TEMELLERİ -->
-        <section class="bg-gray-900 border border-gray-700 p-6 rounded-lg shadow-xl mb-10">
-            <h2 class="text-2xl font-semibold text-white mb-6 text-center flex items-center justify-center space-x-3">
-                <svg class="card-header-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0M3.75 18H7.5m3-6h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0M3.75 12H7.5" />
-                </svg>
-                <span>Başarı İçin Kritik Detaylar</span>
-            </h2>
-            
-            <div class="mb-6">
-                <button id="openIsinmaModal" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-900 font-bold py-4 px-5 rounded-lg text-lg transition duration-300 shadow-lg flex items-center justify-center space-x-3">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-3.867 8.21 8.21 0 0 0 3 .004Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 3.75 3.75 0 0 0-1.993-2.343A3.75 3.75 0 0 0 12 18Z" />
-                    </svg>
-                    <span>Tüm Günler İçin Detaylı Isınma Rutini (ZORUNLU)</span>
-                </button>
+        <button class="warmup-btn" id="openIsinmaModal">
+            <span class="ico">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-3.867 8.21 8.21 0 0 0 3 .004Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 3.75 3.75 0 0 0-1.993-2.343A3.75 3.75 0 0 0 12 18Z" /></svg>
+            </span>
+            <span><b>Isınma Rutini</b><small>10-15 dk · Her antrenmandan önce</small></span>
+            <span class="tag">ZORUNLU</span>
+        </button>
+
+        <!-- Gün sekmeleri -->
+        <nav class="tabs-bar">
+            <div class="tabs" role="tablist" id="tabs"></div>
+        </nav>
+
+        <!-- Aktif gün -->
+        <main id="dayView"></main>
+
+        <!-- Rehber -->
+        <h2 class="section-title">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
+            Başarı İçin Rehber
+        </h2>
+        <div class="guide">
+            <div class="g-card">
+                <h3>
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
+                    Ağırlık Artırma (Nippard)
+                </h3>
+                <p>Kas gelişimi için "Aşamalı Yüklenme" şarttır. <strong class="hl">"Çift Yükseltme"</strong> metodunu kullanın:</p>
+                <ol class="steps">
+                    <li><i>1</i><span>Hedef: <strong>3 Ağır Set × 8-12 Tekrar</strong>.</span></li>
+                    <li><i>2</i><span>3 sette de 12 tekrarı başarırsanız, bir sonraki antrenmanda ağırlığı minimum miktarda artırın.</span></li>
+                    <li><i>3</i><span>Kullandığınız ağırlığı kartlardaki <strong>kg</strong> kutusuna yazın; bir sonraki sefer hatırlanır.</span></li>
+                </ol>
             </div>
-            
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- 1. AŞAMALI YÜKLENME -->
-                <div class="details-box p-5 rounded-lg border border-gray-700">
-                    <h3 class="text-xl font-semibold text-cyan-300 mb-3 flex items-center space-x-2">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
-                        </svg>
-                        <span>Ağırlık Artırma (Nippard)</span>
-                    </h3>
-                    <p class="text-sm text-gray-300 mb-2">Kas gelişimi için "Aşamalı Yüklenme" şarttır. <strong class="text-yellow-300">"Çift Yükseltme"</strong> metodunu kullanın:</p>
-                    <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                        <li>Bir hareket için hedefiniz <strong class="text-white">3 Ağır Set x 8-12 Tekrar</strong> olsun.</li>
-                        <li>3 sette de 12 tekrarı başarırsanız, bir sonraki antrenman ağırlığı minimum miktarda artırın.</li>
-                    </ul>
-                </div>
-
-                <!-- 2. SET ARASI DİNLENME -->
-                <div class="details-box p-5 rounded-lg border border-gray-700">
-                    <h3 class="text-xl font-semibold text-cyan-300 mb-3 flex items-center space-x-2">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                        <span>Set Arası Dinlenme</span>
-                    </h3>
-                    <p class="text-sm text-gray-300 mb-2">Dinlenme süresi, hedefe göre değişir:</p>
-                    <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                        <li><strong>Ağır Bileşik Setler:</strong> <strong class="text-white">2-3 dakika</strong>.</li>
-                        <li><strong>İzolasyon & Back-off Setler:</strong> <strong class="text-white">60-90 saniye</strong>.</li>
-                        <li><strong>Karın Hareketleri:</strong> <strong class="text-white">30-60 saniye</strong>.</li>
-                    </ul>
+            <div class="g-card">
+                <h3>
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                    Set Arası Dinlenme
+                </h3>
+                <p>Bir seti işaretlediğinizde dinlenme sayacı otomatik başlar.</p>
+                <div class="rest-rows">
+                    <div class="rest-row">Ağır bileşik setler <b>2-3 dk</b></div>
+                    <div class="rest-row">İzolasyon & back-off setler <b>60-90 sn</b></div>
+                    <div class="rest-row">Karın hareketleri <b>30-60 sn</b></div>
                 </div>
             </div>
-        </section>
-
-        <!-- BÖLÜM 2: 3 GÜNLÜK BÖLGESEL PPL PLANI -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-semibold text-white mb-6 text-center flex items-center justify-center space-x-3">
-                <svg class="card-header-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12v-.008ZM12 18h.008v.008H12v-.008ZM9 15h.008v.008H9v-.008ZM9 18h.008v.008H9v-.008ZM15 15h.008v.008H15v-.008ZM15 18h.008v.008H15v-.008Z" />
-                </svg>
-                <span>Haftalık PPL Antrenman Dağılımı</span>
-            </h2>
-            <p class="text-center text-gray-400 mb-6">
-                Örnek Dağılım: Pazartesi (İtiş), Çarşamba (Çekiş), Cuma (Bacak & Karın).
-            </p>
-
-            <!-- === ACCORDION YAPISI BAŞLANGIÇ === -->
-
-            <!-- GÜN 1: İTİŞ (Accordion) -->
-            <div class="bg-gray-800 rounded-lg shadow-xl mb-6 border border-gray-700 overflow-hidden">
-                <!-- Accordion Butonu -->
-                <button class="accordion-button w-full p-4 md:p-6 text-left flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-cyan-300">GÜN 1: İTİŞ GÜNÜ (Göğüs, Omuz, Arka Kol)</h3>
-                    <svg class="accordion-icon h-6 w-6 text-cyan-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </button>
-                <!-- Accordion Paneli -->
-                <div class="accordion-panel p-4 md:p-6 pt-0">
-                    <div class="space-y-5 border-t border-gray-700 pt-5">
-                        
-                        <!-- 1. HAREKET (SET GÜNCELLENDİ) -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="dumbellbench.jpg" alt="" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/WbCEvFA0NJs" target="_blank" rel="noopener noreferrer">1. Dumbbell Bench Press</a> <span class="text-xl font-semibold text-white">(Göğüs)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong> <span class="font-bold text-yellow-300">3 Set x 8-12 Tekrar (Ağır)</span></p>
-                                    <p class="text-gray-300"><strong class="text-yellow-300">+ 1 Set x 12-15 Tekrar (Hafif "Back-off Set")</strong></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Ana göğüs hedefi. Son sette ağırlığı %20 düşürüp pump'a odaklanın.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/watch?v=_FkbD0FhgVE" target="_blank" rel="noopener noreferrer">Bench Press</a></strong> (Daha ağır, güç odaklı)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/watch?v=Qu7-ceCvq7w" target="_blank" rel="noopener noreferrer">Machine Chest Press</a></strong> (Daha güvenli, izole)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- 2. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="seatedshoulder.png" alt="Omuz Press" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/watch?v=k6tzKisR3NY" target="_blank" rel="noopener noreferrer">2. Seated Dumbbell Shoulder Press</a> <span class="text-xl font-semibold text-white">(Omuz)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 8-12 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Geniş görünüm için. Sırtınızı sehpaya tam yaslayın. Dambılları çenenizin yanından başlatın.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><a href="https://www.youtube.com/watch?v=6v4nrRVySj0" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100"><strong>Machine Shoulder Press</strong></a> (Daha güvenli, izole)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/watch?v=4LBVP2Oe7fg" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Barbell Overhead Press</a></strong> (Fonksiyonel, tüm kor bölgesi)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 3. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="incline dumbell.jpg" alt="Incline Press" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/watch?v=8fXfwG4ftaQ" target="_blank" rel="noopener noreferrer">3. Incline Dumbbell Press</a> <span class="text-xl font-semibold text-white">(Üst Göğüs)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 10-15 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Göğüs üstünü doldurmak için. Dambılları köprücük kemiğinizin altına doğru indirin.
-                                    </p>
-                                </div>
-                            </div>
-                             <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/watch?v=Qu7-ceCvq7w" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Machine Press</a></strong> (Daha güvenli, izole)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/watch?v=VXaBbUYMfIs" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Smith Machine Incline Press</a></strong> (Sabit yol, ağır kilo)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 4. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="lateralraise.jpg" alt="Dumbbell Lateral Raise" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/watch?v=Kl3LEzQ5Zqs" target="_blank" rel="noopener noreferrer">4. Dumbbell Lateral Raise</a> <span class="text-xl font-semibold text-white">(Yan Omuz)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 12-15 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Hafif ağırlık kullanın. Omuz hizasını geçmeyin. Hareketi yavaş ve kontrollü yapın.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/watch?v=9ilIKuy6B0g" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Cable Lateral Raise</a></strong> (Sürekli gerginlik sağlar)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- 5. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="tricepspush.jpg" alt="Triceps Pushdown" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/watch?v=1FjkhpZsaxc" target="_blank" rel="noopener noreferrer">5. Triceps Pushdown</a> <span class="text-xl font-semibold text-white">(Kablo)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 12-15 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Dirsekler yanda sabit kalsın. Sadece dirsekten bükün ve en altta 1 sn sıkıştırın.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/watch?v=GZ3NzlJs_yg" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Dumbbell Kickbacks</a></strong> (Serbest ağırlık, izole)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/watch?v=K3mFeNz4e3w" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Close Grip Bench Press</a></strong> (Bileşik hareket, ağır kilo)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- 6. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="overheadextension.jpg" alt="Overhead Extension" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/watch?v=oZ1MbUl-_-w" target="_blank" rel="noopener noreferrer">6. Overhead Triceps Extension</a> <span class="text-xl font-semibold text-white">(Dumbbell/Kablo)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 12-15 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Arka kolun "uzun" başını hedefler. Dirseklerinizi başınıza yakın tutun.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/watch?v=Mq9eoGIiCSU" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Skullcrushers</a></strong> (Barbell veya Dumbbell ile)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/watch?v=4ua3MzaU0QU" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Machine Dips</a></strong> (Oturarak, güvenli)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
+            <div class="g-card">
+                <h3>
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
+                    Kardiyo (Yağ Yakımı)
+                </h3>
+                <div class="cardio">
+                    <img src="runninng.jpg" alt="Tempolu yürüyüş" loading="lazy">
+                    <div>
+                        <p><strong>1 Saat Tempolu Yürüyüş</strong></p>
+                        <p>Ağırlık antrenmanı yaptığınız 3 günün <strong class="hl">hemen sonrasında</strong>. Göğüs ve göbekteki yağlanmanın ana çözümü budur.</p>
                     </div>
                 </div>
             </div>
-
-            <!-- GÜN 2: ÇEKİŞ (Accordion) -->
-            <div class="bg-gray-800 rounded-lg shadow-xl mb-6 border border-gray-700 overflow-hidden">
-                <!-- Accordion Butonu -->
-                <button class="accordion-button w-full p-4 md:p-6 text-left flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-cyan-300">GÜN 2: ÇEKİŞ GÜNÜ (Sırt, Pazu, Arka Omuz)</h3>
-                    <svg class="accordion-icon h-6 w-6 text-cyan-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </button>
-                <!-- Accordion Paneli -->
-                <div class="accordion-panel p-4 md:p-6 pt-0">
-                    <div class="space-y-5 border-t border-gray-700 pt-5">
-                        
-                        <!-- 1. HAREKET (SET GÜNCELLENDİ) -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="latpulldown.jpg" alt="Lat Pulldown" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/watch?v=5s6KGLTMgoI" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">1. Lat Pulldown</a> <span class="text-xl font-semibold text-white">(Kanat)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong> <span class="font-bold text-yellow-300">3 Set x 8-12 Tekrar (Ağır)</span></p>
-                                    <p class="text-gray-300"><strong class="text-yellow-300">+ 1 Set x 12-15 Tekrar (Hafif "Back-off Set")</strong></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Ana sırt hareketi. Son sette ağırlığı %20 düşürüp kanatları tam sıkıştırmaya odaklanın.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/watch?v=eDP_OOhMTZ4" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Pull-ups</a></strong> (Vücut ağırlığı, daha zor)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 2. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="seatedcable.jpg" alt="Seated Cable Row" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/LyZH4UGdDTc" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">2. Seated Cable Row (Sırt Kalınlık)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 10-12 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Belden değil, sırttan çekin. Çekiş anında omuzları geriye atıp kürek kemiklerini birleştirin.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/8pR3JoZ0iBU" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">T-Bar Row</a></strong> (Göğüs destekli veya serbest)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- 3. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="singlearm.jpg" alt="Single Arm Dumbbell Row" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/yHqqGd0tXcw" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">3. Single Arm Dumbbell Row (Tek Taraflı Sırt)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 8-10 Tekrar (Her Kol)</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Dambılı kalçanıza doğru çekin, vücudu döndürmeyin. Sırtı tam esnetip tam sıkıştırın.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/czoQ_ncuqqI" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Chest-Supported Row</a></strong> (Belinizi korur, daha izole)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/watch?v=KOaCM1HMwU0" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Inverted Row</a></strong> (Vücut ağırlığı, fonksiyonel)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 4. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                           <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="facepull.jpg" alt="Face Pull" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/watch?v=IeOqdw9WI90" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">4. Face Pull (Arka Omuz - Kablo)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 15-20 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        (Athlean-X favorisi) Baş parmaklar geriyi gösterecek şekilde halatı çekin. Arka omuz ve duruş için kritik.
-                                    </p>
-                                </div>
-                           </div>
-                           <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/SuvO4TBwSu4" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Band Pull-Apart</a></strong> (Esnek lastik ile)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/shorts/-TKqxK7-ehc" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Reverse Pec Deck Machine</a></strong> (Makine, tam izole)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 5. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="bicepcurl.jpg" alt="Biceps Curl" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/MKWBV29S6c0" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">5. Dumbbell Biceps Curl (Pazu)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 10-12 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Vücudu sallamayın (momentum yok). Hareketi indirirken (negatif) yavaş olun.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/54x2WF1_Suc" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Barbell Curl</a></strong> (Daha ağır kilo)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/shorts/0y4tdUNPdlE" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Preacher Curl Machine</a></strong> (Tam izole, sallanma yok)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 6. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="hummercurl.jpg" alt="Hammer Curl" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/_aoad2yuP5w" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">6. Hammer Curl (Pazu/Koltuk)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 10-12 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Avuç içleri birbirine bakar. Bu, pazu altındaki "brachialis" kasını hedefler, kolu daha kalın gösterir.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/p1XzMk3gsU0" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Rope Hammer Curl</a></strong> (Kablo ile, sürekli gerginlik)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/shorts/qmQkt1Y-FX8" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Cross-Body Hammer Curl</a></strong> (Farklı açı, iyi sıkıştırma)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                    </div>
+            <div class="g-card">
+                <h3>
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
+                    Kritik Notlar
+                </h3>
+                <div class="notes">
+                    <div class="note"><span class="dot"></span><span><strong class="hl">Beslenme:</strong> Program kasları "diri" hale getirir, ama üstündeki yağı eritmek %100 beslenmeyle ilgilidir. Mutlaka <strong>kalori açığı</strong> verin.</span></div>
+                    <div class="note"><span class="dot"></span><span><strong class="hl">Form &gt; Ağırlık:</strong> (Athlean-X kuralı) Egoyu kapıda bırakın. Videodaki forma odaklanın, ağırlık zamanla artar.</span></div>
+                    <div class="note"><span class="dot"></span><span><strong class="hl">Esneklik:</strong> Yorgunsanız veya formdan emin değilseniz <strong>Muadiller</strong> bölümündeki seçenekleri kullanın. Güvenlik önce gelir.</span></div>
                 </div>
             </div>
+        </div>
 
-            <!-- GÜN 3: BACAK & KARIN (Accordion) -->
-            <div class="bg-gray-800 rounded-lg shadow-xl mb-6 border border-gray-700 overflow-hidden">
-                <!-- Accordion Butonu -->
-                <button class="accordion-button w-full p-4 md:p-6 text-left flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-cyan-300">GÜN 3: BACAK & KARIN GÜNÜ</h3>
-                    <svg class="accordion-icon h-6 w-6 text-cyan-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </button>
-                <!-- Accordion Paneli -->
-                <div class="accordion-panel p-4 md:p-6 pt-0">
-                    <div class="space-y-5 border-t border-gray-700 pt-5">
-                        
-                        <!-- 1. HAREKET (Bacak Gününe +1 Set GEREKMEZ, zaten zorlayıcı) -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="leggpress.jpg" alt="Leg Press" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/EotSw18oR9w" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">1. Leg Press</a> <span class="text-xl font-semibold text-white">(Bacak - Ana Hareket)</span><span class="video-text">(Video İzle)</span>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 10-15 Tekrar</span> </p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Güvenli alternatif. Ayaklar omuz genişliğinde. İndirirken kalçanızın kalkmamasına dikkat edin.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/iKCJCydYYrE" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Barbell Squat</a></strong> (Riskli ama çok etkili, form şart)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/shorts/dJcCdRH_2i8" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Hack Squat Machine</a></strong> (Squat hissi, daha güvenli)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
+        <footer>İlerlemeniz bu cihazda saklanır · Set işaretleri her gün sıfırlanır</footer>
+    </div>
 
-                        <!-- 2. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="legext.jpg" alt="Leg Extension" width="100%"></div>
-                                <div classs="flex-1">
-                                    <a href="https://www.youtube.com/shorts/iQ92TuvBqRo" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">2. Leg Extension (Ön Bacak)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 12-15 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Bacakları savurmayın. Hareketi yavaş ve kontrollü yapın. En tepede 1 saniye sıkıştırın.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/mJilHWIBWO8" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Dumbbell Lunges</a></strong> (Bileşik hareket, denge ister)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 3. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                           <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="lyingleg.jpg" alt="Lying Leg Curl" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/FRy58-v0YII" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">3. Lying Leg Curl (Arka Bacak)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 12-15 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Kalçanızı sehpaya bastırın, kalkmasına izin vermeyin. Topuklarınızı kalçanıza çekerken tam sıkıştırın.
-                                    </p>
-                                </div>
-                           </div>
-                           <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/yJ_KpXrN8hs" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Seated Leg Curl</a></strong> (Oturarak, farklı açı)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/watch?v=xAL7lHwj30E" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Romanian Deadlift (Dumbbell)</a></strong> (Esneklik ister)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 4. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="calfraise.jpg" alt="Calf Raises" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/wdOkFomQNp8" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">4. Standing Calf Raises (Kalf)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 15-20 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Parmak ucunda 2 saniye bekleyin, yavaşça ve tam esneyerek inin. (Makinede yapmanız tercih edilir).
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/ar8nav0jGoE" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Seated Calf Raise</a></strong> (Oturarak, farklı kası hedefler)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- 5. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                            <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="reversecrunch.jpg" alt="Reverse Crunch" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/ZyE4r7wiI6w" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">5. Reverse Crunch (Alt Karın)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x 15-20 Tekrar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Alt karın hedefi. Bacaklarınızı savurmayın, alt karın kaslarınızı kullanarak kalçanızı yerden kaldırın.
-                                    </A>
-                                </div>
-                            </div>
-                            <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/XQc0WHO90Lk" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Hanging Leg Raises</a></strong> (Daha zordur, asılarak yapılır)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/shorts/kISuoI7QCYk" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Ab Wheel Rollout</a></strong> (Tüm kor bölgesini hedefler)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 6. HAREKET -->
-                        <div class="exercise-card block p-4 rounded-lg">
-                           <div class="flex flex-col md:flex-row items-center">
-                                <div class="exercise-image md:mr-6 mb-4 md:mb-0"><img src="plank.jpg" alt="Plank" width="100%"></div>
-                                <div class="flex-1">
-                                    <a href="https://www.youtube.com/shorts/xe2MXatLTUw" target="_blank" rel="noopener noreferrer">
-                                        <h4 class="text-xl font-semibold text-white hover:text-cyan-300 transition-colors">6. Plank (Tüm Kor)</h4>
-                                    </a>
-                                    <p class="text-gray-300"><strong>Set & Tekrar:</strong><span class="font-bold text-yellow-300"> 3 Set x Dayanabildiğiniz Kadar</span></p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Kalçanızı düşürmeyin veya çok kaldırmayın. Karın ve kalça kaslarınızı sıkarak düz bir çizgi oluşturun.
-                                    </p>
-                                </div>
-                           </div>
-                           <div class="muadiller-box">
-                                <h5 class="text-sm font-semibold text-cyan-300 mb-2">MUADİLLER (Alternatifler):</h5>
-                                <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
-                                    <li><strong><a href="https://www.youtube.com/shorts/K2m0jj6RfYg" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Cable Crunches</a></strong> (Ağırlık takarak karın kasını büyütür)<span class="video-text">(Video İzle)</span></li>
-                                    <li><strong><a href="https://www.youtube.com/shorts/aRUMRbl7KS4" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-100">Russian Twists</a></strong> (Yan karın kaslarını hedefler)<span class="video-text">(Video İzle)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- DİNLENME ZAMANLAYICISI -->
+    <div class="timer" id="timer" role="status" aria-live="polite">
+        <div class="timer-row">
+            <div class="timer-time" id="timerTime">0:00</div>
+            <div class="timer-label"><span id="timerState">Dinlenme</span><b id="timerName"></b></div>
+            <div class="timer-btns">
+                <button id="timerMinus" aria-label="15 saniye azalt">−15</button>
+                <button id="timerPlus" aria-label="15 saniye ekle">+15</button>
+                <button id="timerSkip" class="primary">Geç</button>
             </div>
-            
-        </section>
+        </div>
+        <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+    </div>
 
-        <!-- BÖLÜM 3: KARDİYO VE NOTLAR -->
-        <section class="grid md:grid-cols-2 gap-6">
-            <!-- Kardiyo Planı -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
-                <h2 class="text-2xl font-semibold text-white mb-4 flex items-center space-x-3">
-                    <svg class="card-header-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.64.64a.956.956 0 0 1-1.352 0l-.64-.64a.956.956 0 0 1 0-1.352l.64-.64 2.043-2.043a.956.956 0 0 1 1.352 0l.64.64a.956.956 0 0 1 0 1.352l-.64.64-2.043 2.043a.956.956 0 0 1-1.352 0l-.64-.64a.956.956 0 0 1 0-1.352l.64-.64 2.043-2.043a.956.956 0 0 1 1.352 0l.64.64a.956.956 0 0 1 0 1.352l-.64.64-2.043 2.043a.956.956 0 0 1-1.352 0l-.64-.64a.956.956 0 0 1 0-1.352l.64-.64 2.043-2.043a.956.956 0 0 1 1.352 0l.64.64a.956.956 0 0 1 0 1.352l-.64.64-2.043 2.043a.956.956 0 0 1-1.352 0l-.64-.64a.956.956 0 0 1 0-1.352l.64-.64 2.043-2.043a.956.956 0 0 1 1.352 0l.64.64a.956.956 0 0 1 0 1.352l-.64.64-2.043 2.043a.956.956 0 0 1-1.352 0l-.64-.64a.956.956 0 0 1 0-1.352l.64-.64Z" />
-                    </svg>
-                    <span>Kardiyo (Yağ Yakımı)</span>
-                </h2>
-                <div class="exercise-card flex flex-col md:flex-row items-center p-4 rounded-lg !bg-gray-800 !shadow-none !transform-none">
-                    <div class="exercise-image md:mr-6 mb-4 md:mb-0">
-                        <img src="runninng.jpg" alt="Tempolu Yürüyüş" width="100%" height="80%">
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-semibold text-cyan-300">1 Saat Tempolu Yürüyüş</h3>
-                        <p class="text-gray-300 text-sm"><strong>Ne Zaman:</strong> Ağırlık antrenmanı yaptığınız 3 günün <strong class="text-yellow-300">hemen sonrasında</strong>.</p>
-                        <p class="text-gray-300 text-sm mt-2"><strong>Amaç:</strong> Göğüs ve göbekteki yağlanmanın ana çözümü budur.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Önemli Notlar -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
-                <h2 class="text-2xl font-semibold text-white mb-4 flex items-center space-x-3">
-                    <svg class="card-header-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m4.5 0a12.06 12.06 0 0 0-4.5 0m4.5 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0-1.036.84-1.875 1.875-1.875h.375c1.036 0 1.875.84 1.875 1.875v.375c0 1.036-.84 1.875-1.875 1.875h-.375C10.59 12 9.75 11.16 9.75 10.125v-.375Z" />
-                    </svg>
-                    <span>Kritik Notlar</span>
-                </h2>
-                <ul class="list-disc list-inside space-y-3 text-gray-300 text-sm">
-                    <li>
-                        <strong class="text-yellow-300">Beslenme:</strong> Bu program kaslarınızı "diri" hale getirecek, ancak üstündeki yağı eritmek %100 beslenme ile ilgilidir. Mutlaka <strong class="text-white">kalori açığı</strong> vermelisiniz.
-                    </li>
-                    <li>
-                        <strong class="text-yellow-300">Form > Ağırlık:</strong> (Athlean-X kuralı) Ego'yu kapıda bırakın. Videodaki formu uygulamaya odaklanın, ağırlık zamanla artacaktır.
-                    </li>
-                    <li>
-                        <strong class="text-yellow-300">Esneklik:</strong> Yorgun hissediyorsanız veya formunuzdan emin değilseniz, <strong class="text-white">"MUADİLLER"</strong> bölümündeki seçenekleri kullanmaktan çekinmeyin. Güvenlik her zaman önce gelir.
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-    </div> <!-- .container sonu -->
-
-    <!-- YENİ EKLENEN PWA YÜKLEME MODALI -->
+    <!-- PWA YÜKLEME MODALI -->
     <div id="installPwaModal" class="modal">
-        <!-- class="modal" eklendi, böylece dışarı tıklama gibi temel davranışları alabilir -->
-        <div class="install-modal-content p-6">
-            <img src="logo.png" alt="Logo" class="w-20 h-20 mx-auto mb-4">
-            <h2 class="text-2xl font-bold text-cyan-400 mb-3">Uygulamayı Yükle</h2>
-            <p class="text-gray-300 mb-6">
-                Bu uygulamayı ana ekranınıza ekleyerek daha hızlı erişim sağlayın ve çevrimdışı kullanın.
-            </p>
-            <div class="flex gap-4">
-                <button id="cancelPwaBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                    Daha Sonra
-                </button>
-                <button id="installPwaBtn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg">
-                    Yükle
-                </button>
+        <div class="sheet install-sheet">
+            <img src="logo.png" alt="Logo">
+            <h2>Uygulamayı Yükle</h2>
+            <p>Bu uygulamayı ana ekranınıza ekleyerek daha hızlı erişim sağlayın ve çevrimdışı kullanın.</p>
+            <div class="btn-row">
+                <button id="cancelPwaBtn" class="btn">Daha Sonra</button>
+                <button id="installPwaBtn" class="btn primary">Yükle</button>
             </div>
         </div>
     </div>
-
 
     <!-- ISINMA MODALI -->
-    <div id="isinaModal" class="modal">
-        <div class="modal-content">
-            <span id="closeModalBtn" class="modal-close">&times;</span>
-            <h2 class="text-2xl md:text-3xl font-bold text-cyan-400 mb-6 text-center flex items-center justify-center space-x-3">
-                <svg class="h-8 w-8 text-yellow-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-3.867 8.21 8.21 0 0 0 3 .004Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 3.75 3.75 0 0 0-1.993-2.343A3.75 3.75 0 0 0 12 18Z" />
-                </svg>
-                <span>Detaylı Antrenman Öncesi Isınma</span>
+    <div id="isinaModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="isinmaTitle">
+        <div class="sheet">
+            <button id="closeModalBtn" class="sheet-close" aria-label="Kapat">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 id="isinmaTitle">
+                <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-3.867 8.21 8.21 0 0 0 3 .004Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 3.75 3.75 0 0 0-1.993-2.343A3.75 3.75 0 0 0 12 18Z" /></svg>
+                Antrenman Öncesi Isınma
             </h2>
-            <p class="text-gray-300 mb-6 text-center text-sm">
-                Bu 10-15 dakikalık rutin, sakatlıkları önler ve performansı artırır.
-            </p>
+            <p class="lead">Bu 10-15 dakikalık rutin, sakatlıkları önler ve performansı artırır.</p>
 
-            <div class="space-y-6">
-                <!-- Aşama 1 -->
-                <div>
-                    <h3 class="text-xl font-semibold text-yellow-300 mb-3">Aşama 1: Hafif Kardiyo (5-7 Dakika)</h3>
-                    <div class="flex flex-col md:flex-row items-center bg-gray-700 p-4 rounded-lg">
-                        <div class="exercise-image md:mr-6 mb-4 md:mb-0">Görsel: Hafif Kardiyo</div>
-                        <div class="flex-1">
-                            <h4 class="text-lg font-semibold text-white">Yürüyüş Bandı veya Bisiklet</h4>
-                            <p class="text-gray-300 text-sm"><strong>Amaç:</strong> Vücut ısısını yükseltmek ve kan akışını hızlandırmak.</p>
-                            <p class="text-gray-400 text-sm mt-1">Hafif-orta bir tempoda, terlemeye başlayana kadar devam edin.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Aşama 2 -->
-                <div>
-                    <h3 class="text-xl font-semibold text-yellow-300 mb-3">Aşama 2: Dinamik Esneme (5 Dakika)</h3>
-                    <p class="text-gray-400 text-sm mb-3">Eklemleri ve kasları hareket açıklığı boyunca ısıtın.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-gray-700 p-3 rounded-lg flex items-center space-x-3">
-                            <div class="exercise-image !w-24 !h-20 flex-shrink-0">Görsel: Kol Çevirme</div>
-                            <div>
-                                <h5 class="font-semibold text-white">Kol Çevirme</h5>
-                                <p class="text-sm text-gray-300"><span class="font-bold text-yellow-300">20 sn ileri, 20 sn geri.</span></p>
-                            </div>
-                        </div>
-                        <div class="bg-gray-700 p-3 rounded-lg flex items-center space-x-3">
-                            <div class="exercise-image !w-24 !h-20 flex-shrink-0">Görsel: Gövde Döndürme</div>
-                            <div>
-                                <h5 class="font-semibold text-white">Gövde Döndürme</h5>
-                                <p class="text-sm text-gray-300"><span class="font-bold text-yellow-300">15-20 tekrar.</span></p>
-                            </div>
-                        </div>
-                        <div class="bg-gray-700 p-3 rounded-lg flex items-center space-x-3">
-                            <div class="exercise-image !w-24 !h-20 flex-shrink-0">Görsel: Bacak Sallama</div>
-                            <div>
-                                <h5 class="font-semibold text-white">Bacak Sallama</h5>
-                                <p class="text-sm text-gray-300"><span class="font-bold text-yellow-300">Her bacak 10-12 tekrar.</span></p>
-                            </div>
-                        </div>
-                        <div class="bg-gray-700 p-3 rounded-lg flex items-center space-x-3">
-                            <div class="exercise-image !w-24 !h-20 flex-shrink-0">Görsel: Vücut Ağırlığı Squat</div>
-                            <div>
-                                <h5 class="font-semibold text-white">Vücut Ağırlığı Squat</h5>
-                                <p class="text-sm text-gray-300"><span class="font-bold text-yellow-300">15-20 tekrar.</span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Aşama 3 -->
-                <div>
-                    <h3 class="text-xl font-semibold text-yellow-300 mb-3">Aşama 3: Aktivasyon (2-3 Dakika - Esnek Lastikle)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-gray-700 p-3 rounded-lg flex items-center space-x-3">
-                            <div class="exercise-image !w-24 !h-20 flex-shrink-0">Görsel: Band Pull-Apart</div>
-                            <div>
-                                <h5 class="font-semibold text-white">Band Pull-Apart (Çekiş Günü)</h5>
-                                <p class="text-sm text-gray-300"><span class="font-bold text-yellow-300">15-20 tekrar.</span></p>
-                            </div>
-                        </div>
-                        <div class="bg-gray-700 p-3 rounded-lg flex items-center space-x-3">
-                            <div class="exercise-image !w-24 !h-20 flex-shrink-0">Görsel: Banded Omuz Isınması</div>
-                            <div>
-                                <h5 class="font-semibold text-white">Banded Omuz Isınması (İtiş Günü)</h5>
-                                <p class="text-sm text-gray-300"><span class="font-bold text-yellow-300">15 tekrar.</span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <p class="text-center text-cyan-300 font-semibold mt-6">Artık Ana Antrenmana Hazırsınız!</p>
+            <div class="phase">
+                <span class="phase-num">1</span>
+                <h3>Hafif Kardiyo <span>5-7 dk</span></h3>
+                <p>Yürüyüş bandı veya bisiklet. Vücut ısısını yükseltmek ve kan akışını hızlandırmak için hafif-orta tempoda, terlemeye başlayana kadar devam edin.</p>
             </div>
+            <div class="phase">
+                <span class="phase-num">2</span>
+                <h3>Dinamik Esneme <span>5 dk</span></h3>
+                <p>Eklemleri ve kasları hareket açıklığı boyunca ısıtın.</p>
+                <div class="moves">
+                    <div class="move"><b>Kol Çevirme</b><span>20 sn ileri, 20 sn geri</span></div>
+                    <div class="move"><b>Gövde Döndürme</b><span>15-20 tekrar</span></div>
+                    <div class="move"><b>Bacak Sallama</b><span>Her bacak 10-12</span></div>
+                    <div class="move"><b>Vücut Ağırlığı Squat</b><span>15-20 tekrar</span></div>
+                </div>
+            </div>
+            <div class="phase">
+                <span class="phase-num">3</span>
+                <h3>Aktivasyon <span>2-3 dk · Esnek lastikle</span></h3>
+                <p>Günün kaslarını harekete hazırlayın.</p>
+                <div class="moves">
+                    <div class="move"><b>Band Pull-Apart <small style="color:var(--faint)">(Çekiş)</small></b><span>15-20 tekrar</span></div>
+                    <div class="move"><b>Banded Omuz Isınması <small style="color:var(--faint)">(İtiş)</small></b><span>15 tekrar</span></div>
+                </div>
+            </div>
+            <p class="ready">Artık ana antrenmana hazırsınız!</p>
         </div>
     </div>
 
-    <!-- MODAL JAVASCRIPT -->
+    <!-- PROGRAM VERİSİ -->
     <script>
-        var modal = document.getElementById("isinaModal");
-        var btn = document.getElementById("openIsinmaModal");
-        var span = document.getElementById("closeModalBtn");
-        btn.onclick = function() { modal.style.display = "block"; }
-        span.onclick = function() { modal.style.display = "none"; }
-        
-        // window.onclick'i addEventListener ile değiştiriyoruz ki PWA script'i ile çakışmasın
-        window.addEventListener('click', function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
+        const yt = id => 'https://www.youtube.com/watch?v=' + id;
+        const ys = id => 'https://www.youtube.com/shorts/' + id;
+
+        const DAYS = [
+            {
+                id: 'push', short: 'İtiş', title: 'Gün 1 · İtiş Günü', muscles: 'Göğüs · Omuz · Arka Kol',
+                weekday: 1, weekdayName: 'Pazartesi', color: '#fb923c',
+                exercises: [
+                    { name: 'Dumbbell Bench Press', target: 'Göğüs', img: 'dumbellbench.jpg', video: ys('WbCEvFA0NJs'),
+                      sets: 3, reps: '8-12', heavy: true, backoff: '12-15', rest: 150,
+                      tip: "Ana göğüs hedefi. Son sette ağırlığı %20 düşürüp pump'a odaklanın.",
+                      alts: [['Bench Press', yt('_FkbD0FhgVE'), 'Daha ağır, güç odaklı'], ['Machine Chest Press', yt('Qu7-ceCvq7w'), 'Daha güvenli, izole', 'f2/Chest-Press-Machine.gif']] },
+                    { name: 'Seated Dumbbell Shoulder Press', target: 'Omuz', img: 'seatedshoulder.png', video: yt('k6tzKisR3NY'),
+                      sets: 3, reps: '8-12', rest: 120,
+                      tip: 'Geniş görünüm için. Sırtınızı sehpaya tam yaslayın. Dambılları çenenizin yanından başlatın.',
+                      alts: [['Machine Shoulder Press', yt('6v4nrRVySj0'), 'Daha güvenli, izole'], ['Barbell Overhead Press', yt('4LBVP2Oe7fg'), 'Fonksiyonel, tüm kor bölgesi', 'f1/overhead.gif']] },
+                    { name: 'Incline Dumbbell Press', target: 'Üst Göğüs', img: 'f1/Incline-Dumbbell-Press.gif', video: yt('8fXfwG4ftaQ'),
+                      sets: 3, reps: '10-15', rest: 90,
+                      tip: 'Göğüs üstünü doldurmak için. Dambılları köprücük kemiğinizin altına doğru indirin.',
+                      alts: [['Machine Press', yt('Qu7-ceCvq7w'), 'Daha güvenli, izole', 'f2/Chest-Press-Machine.gif'], ['Smith Machine Incline Press', yt('VXaBbUYMfIs'), 'Sabit yol, ağır kilo']] },
+                    { name: 'Dumbbell Lateral Raise', target: 'Yan Omuz', img: 'lateralraise.jpg', video: yt('Kl3LEzQ5Zqs'),
+                      sets: 3, reps: '12-15', rest: 75,
+                      tip: 'Hafif ağırlık kullanın. Omuz hizasını geçmeyin. Hareketi yavaş ve kontrollü yapın.',
+                      alts: [['Cable Lateral Raise', yt('9ilIKuy6B0g'), 'Sürekli gerginlik sağlar']] },
+                    { name: 'Triceps Pushdown', target: 'Arka Kol · Kablo', img: 'f1/One-arm-triceps-pushdown.gif', video: yt('1FjkhpZsaxc'),
+                      sets: 3, reps: '12-15', rest: 75,
+                      tip: 'Dirsekler yanda sabit kalsın. Sadece dirsekten bükün ve en altta 1 sn sıkıştırın.',
+                      alts: [['Dumbbell Kickbacks', yt('GZ3NzlJs_yg'), 'Serbest ağırlık, izole'], ['Close Grip Bench Press', yt('K3mFeNz4e3w'), 'Bileşik hareket, ağır kilo']] },
+                    { name: 'Overhead Triceps Extension', target: 'Arka Kol', img: 'f1/High-Pulley-Overhead-Tricep-Extension.gif', video: yt('oZ1MbUl-_-w'),
+                      sets: 3, reps: '12-15', rest: 75,
+                      tip: 'Arka kolun "uzun" başını hedefler. Dirseklerinizi başınıza yakın tutun. (Dumbbell veya kablo)',
+                      alts: [['Skullcrushers', yt('Mq9eoGIiCSU'), 'Barbell veya Dumbbell ile'], ['Machine Dips', yt('4ua3MzaU0QU'), 'Oturarak, güvenli']] }
+                ]
+            },
+            {
+                id: 'pull', short: 'Çekiş', title: 'Gün 2 · Çekiş Günü', muscles: 'Sırt · Pazu · Arka Omuz',
+                weekday: 3, weekdayName: 'Çarşamba', color: '#22d3ee',
+                exercises: [
+                    { name: 'Lat Pulldown', target: 'Kanat', img: 'f1/Lat-Pulldown.gif', video: yt('5s6KGLTMgoI'),
+                      sets: 3, reps: '8-12', heavy: true, backoff: '12-15', rest: 150,
+                      tip: 'Ana sırt hareketi. Son sette ağırlığı %20 düşürüp kanatları tam sıkıştırmaya odaklanın.',
+                      alts: [['Pull-ups', yt('eDP_OOhMTZ4'), 'Vücut ağırlığı, daha zor']] },
+                    { name: 'Seated Cable Row', target: 'Sırt Kalınlık', img: 'seatedcable.jpg', video: ys('LyZH4UGdDTc'),
+                      sets: 3, reps: '10-12', rest: 120,
+                      tip: 'Belden değil, sırttan çekin. Çekiş anında omuzları geriye atıp kürek kemiklerini birleştirin.',
+                      alts: [['T-Bar Row', ys('8pR3JoZ0iBU'), 'Göğüs destekli veya serbest']] },
+                    { name: 'Single Arm Dumbbell Row', target: 'Tek Taraflı Sırt', img: 'singlearm.jpg', video: ys('yHqqGd0tXcw'),
+                      sets: 3, reps: '8-10 (her kol)', rest: 90,
+                      tip: 'Dambılı kalçanıza doğru çekin, vücudu döndürmeyin. Sırtı tam esnetip tam sıkıştırın.',
+                      alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Belinizi korur, daha izole', 'f1/dumbbell-chest-supported-row-exercise.gif'], ['Inverted Row', yt('KOaCM1HMwU0'), 'Vücut ağırlığı, fonksiyonel']] },
+                    { name: 'Face Pull', target: 'Arka Omuz · Kablo', img: 'f1/Face-Pull.gif', video: yt('IeOqdw9WI90'),
+                      sets: 3, reps: '15-20', rest: 60,
+                      tip: '(Athlean-X favorisi) Baş parmaklar geriyi gösterecek şekilde halatı çekin. Arka omuz ve duruş için kritik.',
+                      alts: [['Band Pull-Apart', ys('SuvO4TBwSu4'), 'Esnek lastik ile'], ['Reverse Pec Deck Machine', ys('-TKqxK7-ehc'), 'Makine, tam izole', 'f1/cable-rear-delt-fly.gif']] },
+                    { name: 'Dumbbell Biceps Curl', target: 'Pazu', img: 'f1/Flexor-Incline-Dumbbell-Curls.gif', video: ys('MKWBV29S6c0'),
+                      sets: 3, reps: '10-12', rest: 75,
+                      tip: 'Vücudu sallamayın (momentum yok). Hareketi indirirken (negatif) yavaş olun.',
+                      alts: [['Barbell Curl', ys('54x2WF1_Suc'), 'Daha ağır kilo', 'f2/Z-Bar-Curl.gif'], ['Preacher Curl Machine', ys('0y4tdUNPdlE'), 'Tam izole, sallanma yok', 'f1/ez-bar-preacher-curl-exercise.gif']] },
+                    { name: 'Hammer Curl', target: 'Pazu / Ön Kol', img: 'f1/Seated-Hammer-Curl.gif', video: ys('_aoad2yuP5w'),
+                      sets: 3, reps: '10-12', rest: 75,
+                      tip: 'Avuç içleri birbirine bakar. Pazu altındaki "brachialis" kasını hedefler, kolu daha kalın gösterir.',
+                      alts: [['Rope Hammer Curl', ys('p1XzMk3gsU0'), 'Kablo ile, sürekli gerginlik'], ['Cross-Body Hammer Curl', ys('qmQkt1Y-FX8'), 'Farklı açı, iyi sıkıştırma']] }
+                ]
+            },
+            {
+                id: 'legs', short: 'Bacak', title: 'Gün 3 · Bacak & Karın', muscles: 'Ön/Arka Bacak · Kalf · Karın',
+                weekday: 5, weekdayName: 'Cuma', color: '#a3e635',
+                exercises: [
+                    { name: 'Leg Press', target: 'Bacak · Ana Hareket', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
+                      sets: 3, reps: '10-15', rest: 150,
+                      tip: 'Güvenli alternatif. Ayaklar omuz genişliğinde. İndirirken kalçanızın kalkmamasına dikkat edin.',
+                      alts: [['Barbell Squat', ys('iKCJCydYYrE'), 'Riskli ama çok etkili, form şart', 'f1/BBSQ.gif'], ['Hack Squat Machine', ys('dJcCdRH_2i8'), 'Squat hissi, daha güvenli']] },
+                    { name: 'Leg Extension', target: 'Ön Bacak', img: 'LEG-EXTENSION.gif', video: ys('iQ92TuvBqRo'),
+                      sets: 3, reps: '12-15', rest: 75,
+                      tip: 'Bacakları savurmayın. Hareketi yavaş ve kontrollü yapın. En tepede 1 saniye sıkıştırın.',
+                      alts: [['Dumbbell Lunges', ys('mJilHWIBWO8'), 'Bileşik hareket, denge ister']] },
+                    { name: 'Lying Leg Curl', target: 'Arka Bacak', img: 'f1/LEG_CURL.gif', video: ys('FRy58-v0YII'),
+                      sets: 3, reps: '12-15', rest: 75,
+                      tip: 'Kalçanızı sehpaya bastırın, kalkmasına izin vermeyin. Topuklarınızı kalçanıza çekerken tam sıkıştırın.',
+                      alts: [['Seated Leg Curl', ys('yJ_KpXrN8hs'), 'Oturarak, farklı açı'], ['Romanian Deadlift (Dumbbell)', yt('xAL7lHwj30E'), 'Esneklik ister']] },
+                    { name: 'Standing Calf Raises', target: 'Kalf', img: 'Standing-Calf-Raise.gif', video: ys('wdOkFomQNp8'),
+                      sets: 3, reps: '15-20', rest: 60,
+                      tip: 'Parmak ucunda 2 saniye bekleyin, yavaşça ve tam esneyerek inin. (Makinede yapmanız tercih edilir.)',
+                      alts: [['Seated Calf Raise', ys('ar8nav0jGoE'), 'Oturarak, farklı kası hedefler']] },
+                    { name: 'Reverse Crunch', target: 'Alt Karın', img: 'f1/lrase.gif', video: ys('ZyE4r7wiI6w'),
+                      sets: 3, reps: '15-20', rest: 45,
+                      tip: 'Bacaklarınızı savurmayın, alt karın kaslarınızı kullanarak kalçanızı yerden kaldırın.',
+                      alts: [['Hanging Leg Raises', ys('XQc0WHO90Lk'), 'Daha zordur, asılarak yapılır'], ['Ab Wheel Rollout', ys('kISuoI7QCYk'), 'Tüm kor bölgesini hedefler']] },
+                    { name: 'Plank', target: 'Tüm Kor', img: 'f2/Weighted-Front-Plank.gif', video: ys('xe2MXatLTUw'),
+                      sets: 3, reps: 'Maks. süre', rest: 45, noWeight: true,
+                      tip: 'Kalçanızı düşürmeyin veya çok kaldırmayın. Karın ve kalça kaslarınızı sıkarak düz bir çizgi oluşturun.',
+                      alts: [['Cable Crunches', ys('K2m0jj6RfYg'), 'Ağırlık takarak karın kasını büyütür', 'f2/Kneeling-Cable-Crunch.gif'], ['Russian Twists', ys('aRUMRbl7KS4'), 'Yan karın kaslarını hedefler']] }
+                ]
             }
-        });
+        ];
     </script>
 
-    <!-- GÜNCELLENMİŞ PWA YÜKLEME SCRIPT'İ (iOS DESTEĞİ İLE) -->
+    <!-- UYGULAMA -->
+    <script>
+        const ICON = {
+            play: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z"/></svg>',
+            check: '<svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>',
+            clock: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>',
+            reps: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>',
+            chevron: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>',
+            reset: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/></svg>'
+        };
+
+        // --- Yerel depolama (hata verirse sessizce yoksay) ---
+        const store = {
+            get(k, d) { try { const v = localStorage.getItem('idman:' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+            set(k, v) { try { localStorage.setItem('idman:' + k, JSON.stringify(v)); } catch (e) {} }
+        };
+        const todayKey = () => new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
+
+        // Set işaretleri sadece o gün için geçerli; ertesi gün otomatik sıfırlanır.
+        function getDone(dayId) {
+            const s = store.get('done:' + dayId, null);
+            return s && s.date === todayKey() ? new Set(s.sets) : new Set();
+        }
+        function saveDone(dayId, set) { store.set('done:' + dayId, { date: todayKey(), sets: [...set] }); }
+
+        const fmtRest = s => s >= 60 ? (s % 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} dk` : `${s / 60} dk`) : `${s} sn`;
+        const fmtClock = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+        const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const setsOf = ex => Array.from({ length: ex.sets }, (_, i) => String(i + 1)).concat(ex.backoff ? ['B'] : []);
+        const totalSets = day => day.exercises.reduce((n, ex) => n + setsOf(ex).length, 0);
+
+        // Bugün hangi gün? Antrenman günü değilse sıradakini öner.
+        const wd = new Date().getDay();
+        const todayDay = DAYS.find(d => d.weekday === wd);
+        const nextDay = todayDay || DAYS.find(d => d.weekday > wd) || DAYS[0];
+        document.getElementById('todayPill').textContent = todayDay
+            ? `Bugün: ${todayDay.short} günü`
+            : `Bugün dinlenme · Sıradaki: ${nextDay.weekdayName} (${nextDay.short})`;
+
+        // Antrenman günüyse o gün açılır; değilse son bakılan gün (yoksa sıradaki).
+        const savedId = store.get('activeDay', null);
+        let activeId = todayDay ? todayDay.id
+            : DAYS.some(d => d.id === savedId) ? savedId : nextDay.id;
+
+        // --- Sekmeler ---
+        const tabsEl = document.getElementById('tabs');
+        function renderTabs() {
+            tabsEl.innerHTML = DAYS.map(d => {
+                const pct = Math.round(getDone(d.id).size / totalSets(d) * 100);
+                return `<button class="tab" role="tab" style="--c:${d.color}" data-id="${d.id}" aria-selected="${d.id === activeId}">
+                    ${todayDay && todayDay.id === d.id ? '<span class="t-today" title="Bugün"></span>' : ''}
+                    <span class="t-day">${d.weekdayName}</span>
+                    <span class="t-name">${d.short}</span>
+                    <span class="t-bar" style="width:${pct}%"></span>
+                </button>`;
+            }).join('');
+        }
+        tabsEl.addEventListener('click', e => {
+            const t = e.target.closest('.tab');
+            if (!t || t.dataset.id === activeId) return;
+            activeId = t.dataset.id;
+            store.set('activeDay', activeId);
+            render();
+            const bar = document.querySelector('.tabs-bar');
+            if (bar.getBoundingClientRect().top <= 0) window.scrollTo({ top: bar.offsetTop, behavior: 'smooth' });
+        });
+
+        // --- Gün görünümü ---
+        const view = document.getElementById('dayView');
+        function render() {
+            const day = DAYS.find(d => d.id === activeId);
+            const done = getDone(day.id);
+            document.documentElement.style.setProperty('--accent', day.color);
+            document.documentElement.style.setProperty('--accent-soft', day.color + '24');
+            renderTabs();
+
+            const lastDone = store.get('last:' + day.id, null);
+            view.innerHTML = `
+                <section class="day-head">
+                    <div class="day-head-top">
+                        <div>
+                            <h2>${day.title}</h2>
+                            <div class="muscles">${day.muscles}</div>
+                        </div>
+                        <div class="ring">
+                            <svg width="64" height="64" viewBox="0 0 64 64">
+                                <circle cx="32" cy="32" r="27" fill="none" stroke="var(--surface-3)" stroke-width="6"/>
+                                <circle id="ringFill" cx="32" cy="32" r="27" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6" style="transition:stroke-dashoffset .4s"/>
+                            </svg>
+                            <span class="ring-txt" id="ringTxt">0%</span>
+                        </div>
+                    </div>
+                    <div class="day-foot">
+                        <span id="progressTxt"></span>
+                        <button class="ghost-btn" id="resetDay">${ICON.reset} Sıfırla</button>
+                    </div>
+                </section>
+                <div class="ex-list">
+                    ${day.exercises.map((ex, i) => cardHTML(day, ex, i, done)).join('')}
+                </div>`;
+            updateProgress(day, lastDone);
+        }
+
+        function cardHTML(day, ex, i, done) {
+            const w = store.get(`w:${day.id}:${i}`, '');
+            const sets = setsOf(ex);
+            const allDone = sets.every(s => done.has(`${i}-${s}`));
+            return `
+            <article class="ex${allDone ? ' done' : ''}" data-i="${i}">
+                <a class="ex-media" href="${ex.video}" target="_blank" rel="noopener noreferrer" aria-label="${esc(ex.name)} videosunu izle">
+                    <img src="${esc(ex.img)}" alt="${esc(ex.name)}" loading="lazy"${/\.gif$/i.test(ex.img) ? ' class="gif"' : ''}>
+                    <span class="ex-num">${i + 1}</span>
+                    <span class="play">${ICON.play} Video</span>
+                    <span class="done-badge"><span>${ICON.check}</span></span>
+                </a>
+                <div class="ex-body">
+                    <div class="ex-head">
+                        <h3><a href="${ex.video}" target="_blank" rel="noopener noreferrer">${esc(ex.name)}</a></h3>
+                        <span class="target">${esc(ex.target)}</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta sets">${ICON.reps} ${ex.sets} × ${esc(ex.reps)}${ex.heavy ? ' (Ağır)' : ''}</span>
+                        ${ex.backoff ? `<span class="meta backoff">+1 × ${ex.backoff} back-off</span>` : ''}
+                        <button class="meta rest" data-rest="${ex.rest}" title="Dinlenme sayacını başlat">${ICON.clock} ${fmtRest(ex.rest)}</button>
+                    </div>
+                    <p class="tip">${esc(ex.tip)}</p>
+                    <div class="tracker">
+                        <div class="set-btns">
+                            ${sets.map(s => `<button class="set-btn${s === 'B' ? ' bo' : ''}" data-set="${s}" aria-pressed="${done.has(`${i}-${s}`)}" title="${s === 'B' ? 'Back-off set' : s + '. set'}">${s === 'B' ? 'B-off' : s}</button>`).join('')}
+                        </div>
+                        ${ex.noWeight ? '' : `<label class="weight">Ağırlık <input type="number" inputmode="decimal" step="0.5" min="0" placeholder="—" value="${esc(w)}" data-w> kg</label>`}
+                    </div>
+                    <details class="alts">
+                        <summary>${ICON.chevron} Muadiller (${ex.alts.length})</summary>
+                        <ul class="alt-list">
+                            ${ex.alts.map(([n, url, note, gif]) => `<li><a href="${url}" target="_blank" rel="noopener noreferrer">${gif ? `<img class="alt-gif" src="${esc(gif)}" alt="" loading="lazy">` : ''}<span><b>${esc(n)}</b><br><small>${esc(note)}</small></span>${ICON.play}</a></li>`).join('')}
+                        </ul>
+                    </details>
+                </div>
+            </article>`;
+        }
+
+        function updateProgress(day, lastDone) {
+            const done = getDone(day.id);
+            const total = totalSets(day);
+            const pct = Math.round(done.size / total * 100);
+            const ring = document.getElementById('ringFill');
+            ring.style.strokeDashoffset = 169.6 * (1 - done.size / total);
+            ring.setAttribute('stroke', pct === 100 ? 'var(--green)' : 'var(--accent)');
+            document.getElementById('ringTxt').textContent = pct + '%';
+            const last = lastDone ? ` · Son tamamlama: ${new Date(lastDone).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}` : '';
+            document.getElementById('progressTxt').textContent = pct === 100
+                ? 'Harika! Bugünkü antrenman tamamlandı 💪 Şimdi 1 saat yürüyüş.'
+                : `${done.size} / ${total} set tamamlandı${last}`;
+            const bar = tabsEl.querySelector(`[data-id="${day.id}"] .t-bar`);
+            if (bar) bar.style.width = pct + '%';
+        }
+
+        view.addEventListener('click', e => {
+            const day = DAYS.find(d => d.id === activeId);
+            const setBtn = e.target.closest('.set-btn');
+            if (setBtn) {
+                const card = setBtn.closest('.ex');
+                const i = +card.dataset.i;
+                const ex = day.exercises[i];
+                const key = `${i}-${setBtn.dataset.set}`;
+                const done = getDone(day.id);
+                const on = !done.has(key);
+                on ? done.add(key) : done.delete(key);
+                saveDone(day.id, done);
+                setBtn.setAttribute('aria-pressed', on);
+                const allDone = setsOf(ex).every(s => done.has(`${i}-${s}`));
+                card.classList.toggle('done', allDone);
+                if (done.size === totalSets(day)) store.set('last:' + day.id, todayKey());
+                updateProgress(day, store.get('last:' + day.id, null));
+                if (on) {
+                    if (navigator.vibrate) navigator.vibrate(30);
+                    // Back-off ve izolasyon setlerinde kısa, ana setlerde hareketin dinlenmesi
+                    const rest = setBtn.dataset.set === 'B' ? 90 : ex.rest;
+                    if (!allDone) timer.start(rest, ex.name);
+                    else if (done.size < totalSets(day)) timer.start(rest, 'Sıradaki harekete geç');
+                    else timer.stop();
+                }
+                return;
+            }
+            const restBtn = e.target.closest('[data-rest]');
+            if (restBtn) {
+                const ex = day.exercises[+restBtn.closest('.ex').dataset.i];
+                timer.start(+restBtn.dataset.rest, ex.name);
+                return;
+            }
+            const reset = e.target.closest('#resetDay');
+            if (reset && confirm(`${day.short} gününün set işaretleri sıfırlansın mı? (Ağırlıklar korunur)`)) {
+                saveDone(day.id, new Set());
+                timer.stop();
+                render();
+            }
+        });
+        view.addEventListener('input', e => {
+            if (!e.target.matches('[data-w]')) return;
+            const i = e.target.closest('.ex').dataset.i;
+            store.set(`w:${activeId}:${i}`, e.target.value);
+        });
+
+        // --- Dinlenme zamanlayıcısı ---
+        const timer = (() => {
+            const el = document.getElementById('timer');
+            const timeEl = document.getElementById('timerTime');
+            const fill = document.getElementById('timerFill');
+            const stateEl = document.getElementById('timerState');
+            const nameEl = document.getElementById('timerName');
+            let end = 0, total = 0, tick = null, hideT = null;
+
+            function beep() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    [0, .25, .5].forEach(t => {
+                        const o = ctx.createOscillator(), g = ctx.createGain();
+                        o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+                        g.gain.setValueAtTime(.25, ctx.currentTime + t);
+                        g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + t + .18);
+                        o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + .2);
+                    });
+                } catch (e) {}
+            }
+            function update() {
+                const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+                timeEl.textContent = fmtClock(left);
+                fill.style.width = (total ? left / total * 100 : 0) + '%';
+                if (left === 0) {
+                    clearInterval(tick); tick = null;
+                    el.classList.add('finished');
+                    stateEl.textContent = 'Süre doldu!';
+                    timeEl.textContent = 'Hadi!';
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    beep();
+                    hideT = setTimeout(stop, 6000);
+                }
+            }
+            function start(sec, label) {
+                clearTimeout(hideT); clearInterval(tick);
+                total = sec; end = Date.now() + sec * 1000;
+                el.classList.remove('finished');
+                stateEl.textContent = 'Dinlenme';
+                nameEl.textContent = label || '';
+                el.classList.add('show');
+                update();
+                tick = setInterval(update, 250);
+            }
+            function adjust(d) {
+                if (!tick) return;
+                end += d * 1000; total = Math.max(total + d, 1);
+                update();
+            }
+            function stop() { clearTimeout(hideT); clearInterval(tick); tick = null; el.classList.remove('show'); }
+            document.getElementById('timerPlus').onclick = () => adjust(15);
+            document.getElementById('timerMinus').onclick = () => adjust(-15);
+            document.getElementById('timerSkip').onclick = stop;
+            return { start, stop };
+        })();
+
+        render();
+    </script>
+
+    <!-- ISINMA MODALI -->
+    <script>
+        const modal = document.getElementById('isinaModal');
+        document.getElementById('openIsinmaModal').onclick = () => modal.classList.add('open');
+        document.getElementById('closeModalBtn').onclick = () => modal.classList.remove('open');
+        modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('open'); });
+    </script>
+
+    <!-- PWA YÜKLEME SCRIPT'İ (iOS DESTEĞİ İLE) -->
     <script>
         let deferredPrompt;
         const installModal = document.getElementById('installPwaModal');
         const installBtn = document.getElementById('installPwaBtn');
         const cancelBtn = document.getElementById('cancelPwaBtn');
+        const hideInstall = () => { installModal.classList.remove('open'); deferredPrompt = null; };
 
         // Chrome/Edge için 'beforeinstallprompt' olayını dinle
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Tarayıcının varsayılan yükleme teklifini engelle
             e.preventDefault();
-            // Event'i daha sonra kullanmak üzere sakla
             deferredPrompt = e;
-            // Chrome popup'ının tetiklendiğini işaretle
             window.pwaInstallPromptFired = true;
-            // Kendi yükleme popup'ımızı göster
-            if(installModal) installModal.style.display = 'flex';
+            installModal.classList.add('open');
         });
 
-        if(installBtn) {
-            installBtn.addEventListener('click', async () => {
-                // Modal'ı gizle
-                if(installModal) installModal.style.display = 'none';
-                if (deferredPrompt) {
-                    // Tarayıcının yükleme ekranını tetikle
-                    deferredPrompt.prompt();
-                    // Kullanıcının seçimini bekle
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`Kullanıcı yükleme tercihi: ${outcome}`);
-                    // Prompt sadece bir kez kullanılabileceği için event'i temizle
-                    deferredPrompt = null;
-                }
-            });
-        }
-
-        if(cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                // Modal'ı gizle
-                if(installModal) installModal.style.display = 'none';
-                // Event'i temizle (Chrome için)
-                deferredPrompt = null;
-            });
-        }
-
-        // Modal dışına tıklanırsa da kapat
-        window.addEventListener('click', (event) => {
-            if (event.target == installModal) {
-                if(installModal) installModal.style.display = 'none';
+        installBtn.addEventListener('click', async () => {
+            installModal.classList.remove('open');
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Kullanıcı yükleme tercihi: ${outcome}`);
                 deferredPrompt = null;
             }
         });
+        cancelBtn.addEventListener('click', hideInstall);
+        installModal.addEventListener('click', (e) => { if (e.target === installModal) hideInstall(); });
+        window.addEventListener('appinstalled', () => { console.log('İdman uygulaması başarıyla yüklendi!'); hideInstall(); });
 
-        // Uygulama yüklendiğinde
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('İdman uygulaması başarıyla yüklendi!');
-            // Modal'ı gizle
-            if(installModal) installModal.style.display = 'none';
-            deferredPrompt = null;
-        });
-
-        // Sayfa yüklendiğinde iOS kontrolü yap
+        // iOS'ta yükleme talimatlarını göster
         window.addEventListener('load', () => {
-            // iOS tespiti (iPad, iPhone, iPod)
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
-            // Zaten ana ekrandan mı açılmış (standalone) tespiti
             const isStandalone = window.navigator.standalone;
+            if (window.pwaInstallPromptFired || !isIOS || isStandalone) return;
 
-            // Chrome/Edge popup'ı tetiklenmişse veya bu bir iOS cihazı değilse veya
-            // uygulama zaten ana ekrandan açılmışsa hiçbir şey yapma.
-            if (window.pwaInstallPromptFired || !isIOS || isStandalone) {
-                return;
-            }
-
-            // --- Bu kod sadece iPhone/iPad'de ve uygulama yüklü değilken çalışır ---
-            
-            // Chrome'un popup'ı tetiklenmediği için 2 saniye bekle ve
-            // Sadece iOS kullanıcılarına özel bilgilendirme modalını göster.
             setTimeout(() => {
-                // Chrome'un son anda tetiklenmediğinden emin ol
-                if (window.pwaInstallPromptFired || !installModal) return;
-
-                console.log('iOS cihazı algılandı, yükleme talimatları gösteriliyor.');
-
-                const modalTitle = installModal.querySelector('h2');
-                const modalText = installModal.querySelector('p');
-
-                if (modalTitle) modalTitle.textContent = 'Ana Ekrana Ekle';
-                if (modalText) {
-                    modalText.innerHTML = `Bu uygulamayı ana ekranınıza eklemek için, lütfen tarayıcınızın <strong class='text-cyan-300'>'Paylaş'</strong> simgesine ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 inline-block align-text-bottom mx-1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg> ) ve ardından <strong class='text-cyan-300'>'Ana Ekrana Ekle'</strong> seçeneğine dokunun.`;
-                }
-
-                // "Yükle" butonunu gizle (çünkü iOS'ta programatik olarak tetiklenemez)
-                if(installBtn) installBtn.style.display = 'none';
-                
-                if(cancelBtn) {
-                    // "Daha Sonra" butonunu "Anladım" olarak değiştir ve tam genişlik yap
-                    cancelBtn.textContent = 'Anladım';
-                    cancelBtn.style.width = '100%';
-                    cancelBtn.style.textAlign = 'center';
-                }
-
-                // Bilgilendirme modalını göster
-                installModal.style.display = 'flex';
-            }, 2000); // 2 saniye bekle
+                if (window.pwaInstallPromptFired) return;
+                installModal.querySelector('h2').textContent = 'Ana Ekrana Ekle';
+                installModal.querySelector('p').innerHTML = `Bu uygulamayı ana ekranınıza eklemek için tarayıcınızın <strong style="color:var(--accent)">'Paylaş'</strong> simgesine ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display:inline;vertical-align:text-bottom"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg> ) ve ardından <strong style="color:var(--accent)">'Ana Ekrana Ekle'</strong> seçeneğine dokunun.`;
+                installBtn.style.display = 'none';
+                cancelBtn.textContent = 'Anladım';
+                installModal.classList.add('open');
+            }, 2000);
         });
-    </script>
-
-
-    <!-- ACCORDION JAVASCRIPT -->
-    <script>
-        var acc = document.getElementsByClassName("accordion-button");
-        var i;
-
-        for (i = 0; i< acc.length; i++) {
-            acc[i].addEventListener("click", function() {
-                // Butona 'active' class'ı ekle/kaldır
-                this.classList.toggle("active");
-
-                // Sonraki elementi (paneli) al
-                var panel = this.nextElementSibling;
-
-                // Paneli göster/gizle
-                if (panel.style.display === "block") {
-                    panel.style.display = "none";
-                } else {
-                    panel.style.display = "block";
-                }
-            });
-        }
     </script>
 
 </body>
 </html>
-

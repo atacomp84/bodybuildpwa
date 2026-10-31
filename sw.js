@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v2'; // Sürümü güncelledik
+const CACHE_NAME = 'idman-app-v4'; // Hareket GIF'leri eklendi
 // Ana dosyalar
 const urlsToCache = [
   './',
@@ -29,7 +29,21 @@ const imageUrls = [
     './calfraise.jpg',
     './reversecrunch.jpg',
     './plank.jpg',
-    './runninng.jpg'
+    './runninng.jpg',
+    // Hareket GIF'leri
+    './f1/Incline-Dumbbell-Press.gif',
+    './f1/One-arm-triceps-pushdown.gif',
+    './f1/High-Pulley-Overhead-Tricep-Extension.gif',
+    './f1/Lat-Pulldown.gif',
+    './f1/Face-Pull.gif',
+    './f1/Flexor-Incline-Dumbbell-Curls.gif',
+    './f1/Seated-Hammer-Curl.gif',
+    './Leg-Press.gif',
+    './LEG-EXTENSION.gif',
+    './f1/LEG_CURL.gif',
+    './Standing-Calf-Raise.gif',
+    './f1/lrase.gif',
+    './f2/Weighted-Front-Plank.gif'
 ];
 
 self.addEventListener('install', event => {
@@ -80,7 +94,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // "Cache First" stratejisi
+  // Sayfanın kendisi için "Network First": güncellemeler hemen görünür, çevrimdışıyken önbellek kullanılır
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      (async () => {
+        try {
+          const networkResponse = await fetch(event.request);
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        } catch (error) {
+          return (await caches.match(event.request)) || (await caches.match('./index.html'));
+        }
+      })()
+    );
+    return;
+  }
+
+  // Diğer dosyalar için "Cache First" stratejisi
   event.respondWith(
     (async () => {
       // 1. Önbellekte var mı diye bak
