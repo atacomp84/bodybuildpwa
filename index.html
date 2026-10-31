@@ -188,13 +188,13 @@
         }
         .ex:hover { box-shadow: 0 12px 30px -12px rgba(0,0,0,.6); }
         .ex.done { border-color: color-mix(in srgb, var(--green) 55%, var(--border)); }
-        .ex-media { position: relative; display: block; height: 190px; background: var(--surface-3); flex-shrink: 0; }
-        .ex-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s, filter .25s; }
-        .ex-media:hover img { transform: scale(1.04); }
-        /* Animasyonlu GIF'ler beyaz zeminli: kırpmadan tamamını göster */
-        .ex-media:has(img.gif) { background: #fff; }
-        .ex-media img.gif { object-fit: contain; padding: 6px; }
-        .ex-media:hover img.gif { transform: none; }
+        /* Görsel alanı sabit boyutlu; görsel mutlak konumlu olduğu için büyük GIF/fotoğraf kartı asla büyütemez.
+           Tüm egzersiz görselleri beyaz zeminli çizimler: kırpmadan (contain) tamamı gösterilir. */
+        .ex-media { position: relative; display: block; height: 210px; background: #fff; flex-shrink: 0; overflow: hidden; }
+        .ex-media img {
+            position: absolute; inset: 0; width: 100%; height: 100%; box-sizing: border-box;
+            object-fit: contain; padding: 8px; display: block; transition: filter .25s;
+        }
         .ex.done .ex-media img { filter: grayscale(.6) brightness(.6); }
         .ex-num {
             position: absolute; top: 10px; left: 10px; width: 32px; height: 32px; border-radius: 10px;
@@ -280,7 +280,7 @@
 
         @media (min-width: 720px) {
             .ex { flex-direction: row; }
-            .ex-media { width: 230px; height: auto; min-height: 100%; }
+            .ex-media { width: 240px; height: auto; min-height: 220px; }
         }
 
         /* --- REHBER BÖLÜMÜ --- */
@@ -309,6 +309,11 @@
         .note { display: flex; gap: 10px; font-size: .86rem; color: var(--muted); }
         .note .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hl); margin-top: 7px; flex-shrink: 0; }
         footer { text-align: center; color: var(--faint); font-size: .75rem; padding: 32px 0 120px; }
+        .local-badge {
+            padding: 6px 12px; text-align: center;
+            font-size: .75rem; font-weight: 800; letter-spacing: .04em; color: #fff;
+            background: repeating-linear-gradient(135deg, #dc2626 0 14px, #b91c1c 14px 28px);
+        }
         .version {
             display: table; margin: 12px auto 0; padding: 4px 10px; border-radius: 999px;
             background: var(--surface); border: 1px solid var(--border); font-weight: 600; font-variant-numeric: tabular-nums;
@@ -668,10 +673,18 @@
     <!-- UYGULAMA -->
     <script>
         // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
-        const APP_VERSION = { number: 10, date: '31 Ekim 2026' };
+        const APP_VERSION = { number: 11, date: '31 Ekim 2026' };
         (async () => {
             const el = document.getElementById('appVersion');
             el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
+            // Bilgisayardaki önizleme canlı siteyle karıştırılmasın
+            if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+                const bar = document.createElement('div');
+                bar.className = 'local-badge';
+                bar.textContent = `YEREL ÖNİZLEME · Canlı site değil · Sürüm ${APP_VERSION.number}`;
+                document.body.prepend(bar);
+                el.textContent += ' · YEREL';
+            }
             // Çevrimdışı önbelleğin sürümü sayfanınkinden farklıysa güncelleme henüz tamamlanmamıştır
             try {
                 const keys = (await caches.keys()).filter(k => k.startsWith('idman-app-v'));
