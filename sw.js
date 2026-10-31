@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v8'; // Tüm vücut A/B/C programı
+const CACHE_NAME = 'idman-app-v9'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
 // Ana dosyalar
 const urlsToCache = [
   './',

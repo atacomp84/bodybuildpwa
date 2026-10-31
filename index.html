@@ -300,6 +300,10 @@
         .note { display: flex; gap: 10px; font-size: .86rem; color: var(--muted); }
         .note .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hl); margin-top: 7px; flex-shrink: 0; }
         footer { text-align: center; color: var(--faint); font-size: .75rem; padding: 32px 0 120px; }
+        .version {
+            display: table; margin: 12px auto 0; padding: 4px 10px; border-radius: 999px;
+            background: var(--surface); border: 1px solid var(--border); font-weight: 600; font-variant-numeric: tabular-nums;
+        }
 
         /* --- DİNLENME ZAMANLAYICISI --- */
         .timer {
@@ -475,7 +479,11 @@
             </div>
         </div>
 
-        <footer>Bu uygulama tıbbi tavsiye değildir; kalp ritmi şikâyetleriniz için doktorunuza danışın.<br>İlerlemeniz bu cihazda saklanır · Set işaretleri her gün sıfırlanır</footer>
+        <footer>
+            Bu uygulama tıbbi tavsiye değildir; kalp ritmi şikâyetleriniz için doktorunuza danışın.<br>
+            İlerlemeniz bu cihazda saklanır · Set işaretleri her gün sıfırlanır
+            <div class="version" id="appVersion"></div>
+        </footer>
     </div>
 
     <!-- DİNLENME ZAMANLAYICISI -->
@@ -650,6 +658,17 @@
 
     <!-- UYGULAMA -->
     <script>
+        // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
+        const APP_VERSION = { number: 9, date: '31 Ekim 2026' };
+        (async () => {
+            const el = document.getElementById('appVersion');
+            el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
+            // Çevrimdışı önbelleğin sürümü sayfanınkinden farklıysa güncelleme henüz tamamlanmamıştır
+            try {
+                const keys = (await caches.keys()).filter(k => k.startsWith('idman-app-v'));
+                if (keys.length) el.textContent += ` · Önbellek v${keys.map(k => k.replace('idman-app-v', '')).join(', v')}`;
+            } catch (e) {}
+        })();
         const ICON = {
             play: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z"/></svg>',
             check: '<svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>',
