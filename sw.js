@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v11'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+const CACHE_NAME = 'idman-app-v12'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
 // Ana dosyalar
 const urlsToCache = [
   './',
@@ -25,6 +25,7 @@ const imageUrls = [
     './Leg-Press.gif',
     './Dumbbell-Goblet-Squat.gif',
     './LEG-EXTENSION.gif',
+    './Dumbbell-Romanian-Deadlift.gif',
     './Barbell-Good-Morning.gif',
     './cablebicepscurl.gif',
     './f1/Lat-Pulldown.gif',
