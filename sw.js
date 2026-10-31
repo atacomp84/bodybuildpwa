@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v12'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+const CACHE_NAME = 'idman-app-v13'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
 // Ana dosyalar
 const urlsToCache = [
   './',
@@ -14,13 +14,19 @@ const urlsToCache = [
 
 // Uygulamada kullanılan egzersiz resimleri
 const imageUrls = [
-    // GIF'i olmayan hareketlerin fotoğrafları
-    './dumbellbench.jpg',
-    './seatedshoulder.png',
-    './lateralraise.jpg',
-    './seatedcable.jpg',
-    './singlearm.jpg',
     './runninng.jpg',
+    // free-exercise-db (Unlicense) fotoğraflarından üretilen iki pozlu GIF'ler
+    './Dumbbell-Lateral-Raise.gif',
+    './Seated-Cable-Row.gif',
+    './Seated-Dumbbell-Shoulder-Press.gif',
+    './Single-Arm-Dumbbell-Row.gif',
+    './Hack-Squat.gif',
+    './Dumbbell-Bench-Press.gif',
+    './Cable-Lateral-Raise.gif',
+    './Dead-Bug.gif',
+    './Seated-Leg-Curl.gif',
+    './Glute-Bridge.gif',
+    './Machine-Shoulder-Press.gif',
     // Hareket ve muadil GIF'leri (index.html'deki DAYS listesiyle aynı tutun)
     './Leg-Press.gif',
     './Dumbbell-Goblet-Squat.gif',
