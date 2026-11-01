@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v15'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+const CACHE_NAME = 'idman-app-v16'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
 // Ana dosyalar
 const urlsToCache = [
   './',
@@ -27,6 +27,12 @@ const imageUrls = [
     './Seated-Leg-Curl.gif',
     './Glute-Bridge.gif',
     './Machine-Shoulder-Press.gif',
+    './Standing-Calf-Raise.gif',
+    './Seated-Calf-Raise.gif',
+    './Single-Leg-Calf-Raise.gif',
+    './Hip-Abduction.gif',
+    './Side-Lying-Leg-Raise.gif',
+    './Banded-Clamshell.jpg',
     // Hareket ve muadil GIF'leri (index.html'deki DAYS listesiyle aynı tutun)
     './Leg-Press.gif',
     './Dumbbell-Goblet-Squat.gif',

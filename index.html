@@ -543,7 +543,8 @@
 
         <footer>
             Bu uygulama tıbbi tavsiye değildir; kalp ritmi şikâyetleriniz için doktorunuza danışın.<br>
-            İlerlemeniz bu cihazda saklanır · Set işaretleri her gün sıfırlanır
+            İlerlemeniz bu cihazda saklanır · Set işaretleri her gün sıfırlanır<br>
+            Hareket fotoğrafları: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener">free-exercise-db</a> (kamu malı) · Clamshell: <a href="https://www.flickr.com/photos/86598533@N04/8252278447/" target="_blank" rel="noopener">bwanderd, Flickr</a>, <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener">CC BY 2.0</a>
             <div class="version" id="appVersion"></div>
         </footer>
     </div>
@@ -652,10 +653,10 @@
                       sets: 2, reps: '10-15', rest: 120, noWeight: true,
                       tip: 'Belinizi yere bastırın. Bacakları savurmadan, alt karınla yavaşça kaldırıp indirin. Zorlanırsanız dizleri bükün.',
                       alts: [['Dead Bug', ysearch('dead bug exercise form'), 'En güvenli karın hareketi, bele yük yok', 'Dead-Bug.gif']] },
-                    { name: 'Standing Calf Raise', target: 'Baldır', img: '', video: ysearch('standing calf raise machine form'),
+                    { name: 'Standing Calf Raise', target: 'Baldır', img: 'Standing-Calf-Raise.gif', video: ysearch('standing calf raise machine form'),
                       sets: 2, reps: '12-15', rest: 90,
                       tip: 'Makinede ya da bir basamakta. Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Yürüyüş programınız için baldır ve aşil güvenliği.',
-                      alts: [['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', ''], ['Basamakta Vücut Ağırlığı', ysearch('bodyweight calf raise step'), 'Ağırlıksız, her yerde', '']] }
+                      alts: [['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', 'Seated-Calf-Raise.gif'], ['Tek Bacak Calf Raise (basamak / yükselti)', ysearch('single leg calf raise step'), 'Ağırlıksız, her yerde', 'Single-Leg-Calf-Raise.gif']] }
                 ]
             },
             {
@@ -686,10 +687,10 @@
                       sets: 2, reps: '10-12', rest: 120,
                       tip: 'Vücudu sallamayın. Kaldırırken nefes verin, indirirken yavaş olun.',
                       alts: [['Cable Biceps Curl', ysearch('cable biceps curl form'), 'Sürekli gerginlik', 'cablebicepscurl.gif'], ['Preacher Curl', ys('0y4tdUNPdlE'), 'Tam izole, sallanma yok', 'f1/ez-bar-preacher-curl-exercise.gif']] },
-                    { name: 'Hip Abduction', target: 'Yan Kalça', img: '', video: ysearch('hip abduction machine form'),
+                    { name: 'Hip Abduction', target: 'Yan Kalça', img: 'Hip-Abduction.gif', video: ysearch('hip abduction machine form'),
                       sets: 2, reps: '12-15', rest: 90,
                       tip: 'Makinede ya da dizlerin üstünde lastikle. Yavaş açın, 1 sn tutun. Diz sağlığı ve yürürken denge için.',
-                      alts: [['Banded Clamshell', ysearch('banded clamshell exercise'), 'Yerde yan yatarak, lastikle', ''], ['Side-Lying Leg Raise', ysearch('side lying leg raise form'), 'Ağırlıksız', '']] }
+                      alts: [['Banded Clamshell', ysearch('banded clamshell exercise'), 'Yerde yan yatarak, lastikle', 'Banded-Clamshell.jpg'], ['Side-Lying Leg Raise', ysearch('side lying leg raise form'), 'Ağırlıksız, yan yatarak', 'Side-Lying-Leg-Raise.gif']] }
                 ]
             },
             {
@@ -712,7 +713,7 @@
                       sets: 3, reps: '10-12 (her kol)', rest: 120,
                       tip: 'Elinizi ve dizinizi sehpaya dayayın. Dambılı kalçanıza doğru çekin, vücudu döndürmeyin.',
                       alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Göğüs destekli, beli korur', 'f1/dumbbell-chest-supported-row-exercise.gif']] },
-                    { name: 'Standing Calf Raise', target: 'Baldır', img: '', video: ysearch('standing calf raise machine form'),
+                    { name: 'Standing Calf Raise', target: 'Baldır', img: 'Standing-Calf-Raise.gif', video: ysearch('standing calf raise machine form'),
                       sets: 2, reps: '12-15', rest: 90,
                       tip: 'Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Haftada iki kez baldır, yürüyüşte aşil ve diz dostu.',
                       alts: [['Hammer Curl (kol isterseniz)', ys('_aoad2yuP5w'), 'Avuç içleri karşılıklı, oturarak', 'f1/Seated-Hammer-Curl.gif'], ['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
@@ -729,7 +730,7 @@
     <!-- UYGULAMA -->
     <script>
         // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
-        const APP_VERSION = { number: 15, date: '1 Kasım 2026' };
+        const APP_VERSION = { number: 16, date: '1 Kasım 2026' };
         (async () => {
             const el = document.getElementById('appVersion');
             el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
