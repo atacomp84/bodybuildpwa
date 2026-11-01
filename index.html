@@ -655,8 +655,8 @@
                       alts: [['Dead Bug', ysearch('dead bug exercise form'), 'En güvenli karın hareketi, bele yük yok', 'Dead-Bug.gif']] },
                     { name: 'Standing Calf Raise', target: 'Baldır', img: 'Standing-Calf-Raise.gif', video: ysearch('standing calf raise machine form'),
                       sets: 2, reps: '12-15', rest: 90,
-                      tip: 'Makinede ya da bir basamakta. Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Yürüyüş programınız için baldır ve aşil güvenliği.',
-                      alts: [['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', 'Seated-Calf-Raise.gif'], ['Tek Bacak Calf Raise (basamak / yükselti)', ysearch('single leg calf raise step'), 'Ağırlıksız, her yerde', 'Single-Leg-Calf-Raise.gif']] }
+                      tip: 'Basamakta ya da makinede. Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Yürüyüş programınız için baldır ve aşil güvenliği.',
+                      alts: [['Machine Calf Raise', ysearch('standing calf raise machine form'), 'Makinede, omuz yastıklı', 'Machine-Calf-Raise.gif'], ['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', 'Seated-Calf-Raise.gif'], ['Tek Bacak Calf Raise (yükseltide)', ysearch('single leg calf raise step'), 'Ağırlıksız ya da hafif dambılla', 'Single-Leg-Calf-Raise.gif']] }
                 ]
             },
             {
@@ -716,7 +716,7 @@
                     { name: 'Standing Calf Raise', target: 'Baldır', img: 'Standing-Calf-Raise.gif', video: ysearch('standing calf raise machine form'),
                       sets: 2, reps: '12-15', rest: 90,
                       tip: 'Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Haftada iki kez baldır, yürüyüşte aşil ve diz dostu.',
-                      alts: [['Hammer Curl (kol isterseniz)', ys('_aoad2yuP5w'), 'Avuç içleri karşılıklı, oturarak', 'f1/Seated-Hammer-Curl.gif'], ['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
+                      alts: [['Machine Calf Raise', ysearch('standing calf raise machine form'), 'Makinede, omuz yastıklı', 'Machine-Calf-Raise.gif'], ['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', 'Seated-Calf-Raise.gif'], ['Hammer Curl (kol isterseniz)', ys('_aoad2yuP5w'), 'Avuç içleri karşılıklı, oturarak', 'f1/Seated-Hammer-Curl.gif'], ['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
                     { name: 'Plank (kısa süreli)', target: 'Tüm Kor', img: 'f2/Weighted-Front-Plank.gif', video: ys('xe2MXatLTUw'),
                       sets: 3, reps: '20-30 sn', rest: 120, noWeight: true,
                       breath: 'Nefesi tutmayın! Plank boyunca sakin ve düzenli nefes alıp verin. Ağırlık koymadan yapın.',
@@ -730,7 +730,7 @@
     <!-- UYGULAMA -->
     <script>
         // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
-        const APP_VERSION = { number: 16, date: '1 Kasım 2026' };
+        const APP_VERSION = { number: 17, date: '1 Kasım 2026' };
         (async () => {
             const el = document.getElementById('appVersion');
             el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
