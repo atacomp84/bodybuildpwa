@@ -287,6 +287,24 @@
         .prev b { color: var(--text); }
         .prev.up b { color: var(--hl); }
         .ghost-btn.confirm { color: #fff; background: #dc2626; border-color: #dc2626; }
+        /* Hafif gün anahtarı */
+        .light-btn {
+            width: 100%; display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center; text-align: left;
+            margin-top: 14px; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted);
+            transition: border-color .2s, background .2s;
+        }
+        .light-btn svg { grid-row: 1 / 3; color: var(--faint); }
+        .light-btn b { color: var(--text); font-size: .9rem; }
+        .light-btn small { grid-column: 2; font-size: .76rem; }
+        .light-btn .switch { grid-row: 1 / 3; width: 42px; height: 24px; border-radius: 999px; background: var(--surface-3); position: relative; transition: background .2s; }
+        .light-btn .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: left .2s; }
+        .light-btn[aria-pressed="true"] { border-color: var(--warm-border); background: var(--warm-bg); }
+        .light-btn[aria-pressed="true"] svg { color: var(--warm-ico); }
+        .light-btn[aria-pressed="true"] .switch { background: var(--hl); }
+        .light-btn[aria-pressed="true"] .switch::after { left: 21px; }
+        .meta.light-kg { color: var(--warm-ico); background: var(--warm-bg); border-color: var(--warm-border); }
+        .meta.sets s { color: var(--faint); font-weight: 500; }
+        .hist-day.light { opacity: .45; }
         .walk-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 10px; font-size: .82rem; font-weight: 700; border: 1.5px solid var(--green); background: transparent; color: var(--green); }
         .walk-btn[aria-pressed="true"] { background: var(--green); color: #fff; }
 
@@ -535,7 +553,7 @@
                     <div class="note"><span class="dot"></span><span><strong class="hl">Önce alışkanlık, sonra beslenme:</strong> (Helms) İlk hedef haftada 3 antrenmanı aksatmamak. Düzen oturduktan sonra <strong>küçük, sürdürülebilir</strong> beslenme değişiklikleri yeter; sert diyet ve kalori saplantısı gerekmez.</span></div>
                     <div class="note"><span class="dot"></span><span><strong class="hl">Form &gt; Ağırlık:</strong> (Athlean-X kuralı) Egoyu kapıda bırakın. Videodaki forma odaklanın, ağırlık zamanla artar.</span></div>
                     <div class="note"><span class="dot"></span><span><strong class="hl">Esneklik:</strong> Yorgunsanız veya formdan emin değilseniz <strong>Muadiller</strong> bölümündeki seçenekleri kullanın. Güvenlik önce gelir.</span></div>
-                    <div class="note"><span class="dot"></span><span><strong class="hl">Kötü gün:</strong> Kaygılı ya da uykusuz bir günde seti ve ağırlığı azaltıp yine de gelmek, hiç gelmemekten iyidir. Program sizin için var, siz program için değil.</span></div>
+                    <div class="note"><span class="dot"></span><span><strong class="hl">Kötü gün:</strong> Kaygılı ya da uykusuz bir günde gün başlığındaki <strong>Hafif gün</strong> anahtarını açın: setler 2'ye iner, ağırlık %20 düşer, o gün ağırlık artırma önerisi yapılmaz. Az yapıp gelmek, hiç gelmemekten iyidir.</span></div>
                 </div>
             </div>
         </div>
@@ -730,7 +748,7 @@
     <!-- UYGULAMA -->
     <script>
         // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
-        const APP_VERSION = { number: 17, date: '1 Kasım 2026' };
+        const APP_VERSION = { number: 18, date: '1 Kasım 2026' };
         (async () => {
             const el = document.getElementById('appVersion');
             el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
@@ -758,6 +776,7 @@
             reset: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/></svg>',
             up: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>',
             history: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>',
+            feather: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5l6.74-6.76ZM16 8 2 22m15.5-7H9"/></svg>',
             walk: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm-3 17 2-6m-3-2 2-5 3 1 3 4m-6-5-3 2-1 4m5-4 1 4 3 3"/></svg>'
         };
         document.getElementById('statMoves').textContent = DAYS.reduce((n, d) => n + d.exercises.length, 0);
@@ -797,10 +816,16 @@
         }
         function saveDone(dayId, set) { store.set('done:' + dayId, { date: todayKey(), sets: [...set] }); }
 
+        const fmtKg = n => String(Math.round(n * 2) / 2).replace('.', ',');
         const fmtRest = s => s >= 60 ? (s % 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} dk` : `${s / 60} dk`) : `${s} sn`;
         const fmtClock = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
         const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        const setsOf = ex => Array.from({ length: ex.sets }, (_, i) => String(i + 1)).concat(ex.backoff ? ['B'] : []);
+        // Hafif gün: kaygılı / uykusuz günlerde setler en fazla 2, ağırlık %20 az. Günlük anahtar.
+        const lightKey = () => 'light:' + todayKey();
+        const isLight = () => !!store.get(lightKey(), false);
+        const lightSets = ex => isLight() ? Math.min(ex.sets, 2) : ex.sets;
+        const lightKg = w => { const n = parseFloat(String(w).replace(',', '.')); return n > 0 ? fmtKg(Math.max(0.5, n * 0.8)) : ''; };
+        const setsOf = ex => Array.from({ length: lightSets(ex) }, (_, i) => String(i + 1)).concat(ex.backoff && !isLight() ? ['B'] : []);
         const totalSets = day => day.exercises.reduce((n, ex) => n + setsOf(ex).length, 0);
 
         // Bugün hangi gün? Antrenman günü değilse sıradakini öner.
@@ -840,13 +865,13 @@
                 const h = store.get('hist:' + d.toLocaleDateString('sv-SE'), null);
                 const day = h && DAYS.find(x => x.id === h.day);
                 if (h) { trained++; if (h.walk) walks++; }
-                const title = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' }) + (h ? ` · ${day ? day.short : 'Antrenman'}${h.walk ? ' + yürüyüş' : ''}` : '');
-                cells.push(`<span class="hist-day${h ? ' train' : ''}${h && h.walk ? ' walk' : ''}${k === 0 ? ' today' : ''}" style="--dc:${day ? dayColor(day) : 'var(--accent)'}" title="${title}"></span>`);
+                const title = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' }) + (h ? ` · ${day ? day.short : 'Antrenman'}${h.light ? ' (hafif)' : ''}${h.walk ? ' + yürüyüş' : ''}` : '');
+                cells.push(`<span class="hist-day${h ? ' train' : ''}${h && h.light ? ' light' : ''}${h && h.walk ? ' walk' : ''}${k === 0 ? ' today' : ''}" style="--dc:${day ? dayColor(day) : 'var(--accent)'}" title="${title}"></span>`);
             }
             document.getElementById('hist').innerHTML = `
                 <div class="hist-top"><span>Son 4 hafta</span><span><b>${trained}</b> antrenman · <b>${walks}</b> yürüyüş</span></div>
                 <div class="hist-grid">${cells.join('')}</div>
-                <div class="hist-legend"><span><i style="background:var(--accent)"></i>Antrenman</span><span><i style="background:var(--accent);box-shadow:inset -3px -3px 0 0 #fff"></i>+ yürüyüş</span><span><i style="background:var(--surface-3)"></i>Boş</span></div>`;
+                <div class="hist-legend"><span><i style="background:var(--accent)"></i>Antrenman</span><span><i style="background:var(--accent);opacity:.45"></i>Hafif gün</span><span><i style="background:var(--accent);box-shadow:inset -3px -3px 0 0 #fff"></i>+ yürüyüş</span><span><i style="background:var(--surface-3)"></i>Boş</span></div>`;
             return trained;
         }
         // Rehber ilk haftalarda açık gelsin, program oturunca katlansın
@@ -854,10 +879,9 @@
 
         // --- Geçen sefer / çift yükseltme ---
         const repsMax = ex => { const m = String(ex.reps).match(/(\d+)\s*-\s*(\d+)/); return m ? +m[2] : null; };
-        const fmtKg = n => String(Math.round(n * 2) / 2).replace('.', ',');
         function prevLine(day, ex, i) {
             const p = store.get(`prev:${day.id}:${i}`, null);
-            if (!p) return '';
+            if (!p || isLight()) return ''; // hafif günde ağırlık artırma önerisi yapılmaz
             const what = [p.w ? `${p.w} kg` : '', p.r ? `${p.r} ${ex.noWeight ? '' : 'tekrar'}`.trim() : ''].filter(Boolean).join(' × ');
             if (!what) return '';
             const max = repsMax(ex);
@@ -916,6 +940,10 @@
                             <span class="ring-txt" id="ringTxt">0%</span>
                         </div>
                     </div>
+                    <button class="light-btn" id="lightBtn" aria-pressed="${isLight()}" title="Kaygılı, uykusuz ya da yorgun günler için: setler en fazla 2, ağırlık %20 az">
+                        ${ICON.feather}<b>Hafif gün</b><small>${isLight() ? 'Açık: 2 set, ağırlık %20 az. Gelmek yeter.' : 'Kötü günde aç: setler 2\'ye, ağırlık %20 aşağı'}</small>
+                        <span class="switch"></span>
+                    </button>
                     <div class="day-foot">
                         <span id="progressTxt"></span>
                         <span id="walkSlot"></span>
@@ -949,7 +977,8 @@
                         <span class="target">${esc(ex.target)}</span>
                     </div>
                     <div class="meta-row">
-                        <span class="meta sets">${ICON.reps} ${ex.sets} × ${esc(ex.reps)}${ex.heavy ? ' (Ağır)' : ''}</span>
+                        <span class="meta sets">${ICON.reps} ${lightSets(ex)} × ${esc(ex.reps)}${isLight() && lightSets(ex) < ex.sets ? ` <s>${ex.sets}</s>` : ''}</span>
+                        ${isLight() && !ex.noWeight && lightKg(w) ? `<span class="meta light-kg" title="Kayıtlı ağırlığın %80'i">${ICON.feather} ~${lightKg(w)} kg</span>` : ''}
                         ${ex.backoff ? `<span class="meta backoff">+1 × ${ex.backoff} back-off</span>` : ''}
                         <span class="meta rir" title="Her sette 2-3 tekrar daha yapabilecekken durun">2-3 tekrar yedekte</span>
                         <button class="meta rest" data-rest="${ex.rest}" title="Dinlenme sayacını başlat">${ICON.clock} ${fmtRest(ex.rest)}</button>
@@ -999,7 +1028,7 @@
         function recordDay(day, finished) {
             const key = 'hist:' + todayKey();
             const h = store.get(key, null);
-            if (finished) store.set(key, { day: day.id, walk: !!(h && h.walk) });
+            if (finished) store.set(key, { day: day.id, walk: !!(h && h.walk), light: isLight() });
             else if (h && h.day === day.id) store.set(key, null);
             renderHist();
         }
@@ -1019,8 +1048,9 @@
                 setBtn.setAttribute('aria-pressed', on);
                 const allDone = setsOf(ex).every(s => done.has(`${i}-${s}`));
                 card.classList.toggle('done', allDone);
-                // Hareket bitince bugünkü kilo/tekrar "geçen sefer" olarak saklanır (çift yükseltme önerisi için)
-                if (allDone) store.set(`prev:${day.id}:${i}`, { date: todayKey(), w: store.get(`w:${day.id}:${i}`, ''), r: store.get(`r:${day.id}:${i}`, '') });
+                // Hareket bitince bugünkü kilo/tekrar "geçen sefer" olarak saklanır (çift yükseltme önerisi için).
+                // Hafif günde saklanmaz: düşük kilo/az set bir sonraki öneriyi bozmasın.
+                if (allDone && !isLight()) store.set(`prev:${day.id}:${i}`, { date: todayKey(), w: store.get(`w:${day.id}:${i}`, ''), r: store.get(`r:${day.id}:${i}`, '') });
                 const finished = done.size === totalSets(day);
                 if (finished) store.set('last:' + day.id, todayKey());
                 recordDay(day, finished);
@@ -1039,6 +1069,15 @@
             if (restBtn) {
                 const ex = day.exercises[+restBtn.closest('.ex').dataset.i];
                 timer.start(+restBtn.dataset.rest, ex.name);
+                return;
+            }
+            const light = e.target.closest('#lightBtn');
+            if (light) {
+                store.set(lightKey(), !isLight());
+                if (navigator.vibrate) navigator.vibrate(20);
+                // Gün bitmiş sayılıyorsa (az setle) takvim kaydını da güncelle
+                recordDay(day, getDone(day.id).size >= totalSets(day));
+                render();
                 return;
             }
             const walk = e.target.closest('#walkBtn');
