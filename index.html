@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bölgesel Vücut Geliştirme Planı</title>
+    <title>İdman · Sakin Kuvvet</title>
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" href="icons/icon-192x192.png" type="image/png">
     <link rel="manifest" href="./manifest.json">
@@ -144,6 +144,26 @@
         .warmup-btn b { display: block; font-size: 1rem; }
         .warmup-btn small { color: var(--muted); font-size: .8rem; }
         .warmup-btn .tag { margin-left: auto; font-size: .7rem; font-weight: 700; color: #111; background: var(--tag); padding: 3px 8px; border-radius: 999px; }
+        .warm-row { display: flex; gap: 8px; align-items: stretch; }
+        .warm-row .warmup-btn { flex: 1; min-width: 0; }
+        .warm-done {
+            flex-shrink: 0; width: 54px; border-radius: var(--radius); border: 1.5px solid var(--warm-border);
+            background: var(--surface); color: var(--muted); display: grid; place-items: center; box-shadow: var(--shadow);
+            font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; line-height: 1.1; text-align: center;
+        }
+        .warm-done[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+
+        /* --- SON 4 HAFTA --- */
+        .hist { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 14px; padding: 10px 12px; margin-bottom: 14px; }
+        .hist-top { display: flex; justify-content: space-between; align-items: baseline; font-size: .75rem; color: var(--muted); margin-bottom: 8px; }
+        .hist-top b { color: var(--text); }
+        .hist-grid { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; }
+        .hist-day { aspect-ratio: 1; border-radius: 5px; background: var(--surface-3); position: relative; }
+        .hist-day.train { background: var(--dc); }
+        .hist-day.walk::after { content: ""; position: absolute; right: 2px; bottom: 2px; width: 5px; height: 5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.25); }
+        .hist-day.today { outline: 2px solid var(--text); outline-offset: -2px; }
+        .hist-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: .7rem; color: var(--faint); margin-top: 8px; }
+        .hist-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
 
         /* --- GÜN SEKMELERİ --- */
         .tabs-bar {
@@ -258,6 +278,17 @@
             background: var(--surface-2); border: 1.5px solid var(--border); color: var(--text); font: inherit; font-weight: 700; font-size: .95rem;
         }
         .weight input:focus { outline: none; border-color: var(--accent); }
+        .weight.reps input { width: 60px; }
+        .prev {
+            display: flex; align-items: flex-start; gap: 6px; margin: 10px 0 0; padding: 7px 10px; border-radius: 10px;
+            font-size: .8rem; color: var(--muted); background: var(--surface-2); border: 1px dashed var(--border);
+        }
+        .prev.up { color: var(--hl); border-color: var(--warm-border); background: var(--warm-bg); }
+        .prev b { color: var(--text); }
+        .prev.up b { color: var(--hl); }
+        .ghost-btn.confirm { color: #fff; background: #dc2626; border-color: #dc2626; }
+        .walk-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 10px; font-size: .82rem; font-weight: 700; border: 1.5px solid var(--green); background: transparent; color: var(--green); }
+        .walk-btn[aria-pressed="true"] { background: var(--green); color: #fff; }
 
         details.alts { margin-top: 12px; }
         details.alts summary {
@@ -286,6 +317,11 @@
         /* --- REHBER BÖLÜMÜ --- */
         .section-title { display: flex; align-items: center; gap: 10px; margin: 36px 0 14px; font-size: 1.2rem; font-weight: 800; }
         .section-title svg { color: var(--accent); }
+        .guide-wrap summary { list-style: none; cursor: pointer; }
+        .guide-wrap summary::-webkit-details-marker { display: none; }
+        .section-toggle { margin-left: auto; font-size: .78rem; font-weight: 600; color: var(--accent); }
+        .section-toggle::before { content: "Aç"; }
+        .guide-wrap[open] .section-toggle::before { content: "Kapat"; }
         .guide { display: grid; gap: 12px; }
         @media (min-width: 720px) {
             .guide { grid-template-columns: 1fr 1fr; }
@@ -329,6 +365,8 @@
             margin-bottom: env(safe-area-inset-bottom);
         }
         .timer.show { transform: translate(-50%, 0); }
+        /* Sayaç açıkken son kartın set düğmeleri panelin arkasında kalmasın */
+        body.timer-open .wrap { padding-bottom: 110px; }
         .timer-row { display: flex; align-items: center; gap: 12px; }
         .timer-time { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; min-width: 92px; }
         .timer-label { flex: 1; min-width: 0; font-size: .78rem; color: var(--muted); }
@@ -394,8 +432,8 @@
         <header class="hero">
             <img src="logo.png" alt="Logo">
             <div>
-                <h1>Bölgesel Vücut Geliştirme Planı</h1>
-                <p>Haftada 3 gün · Tüm Vücut A / B / C · Sakin tempo</p>
+                <h1>İdman · Sakin Kuvvet</h1>
+                <p>Haftada 3 gün · Tüm vücut A / B / C · Nabza saygılı tempo</p>
                 <span class="today-pill" id="todayPill"></span>
             </div>
             <button class="theme-btn" id="themeBtn" aria-label="Temayı değiştir" title="Açık / koyu tema"></button>
@@ -404,17 +442,23 @@
         <!-- Özet -->
         <div class="stats">
             <div class="stat"><b>3</b><span>gün / hafta</span></div>
-            <div class="stat"><b>18</b><span>hareket</span></div>
-            <div class="stat"><b>60 dk</b><span>yürüyüş / gün</span></div>
+            <div class="stat"><b id="statMoves">18</b><span>hareket</span></div>
+            <div class="stat"><b>60 dk</b><span>yürüyüş / antrenman</span></div>
         </div>
 
-        <button class="warmup-btn" id="openIsinmaModal">
-            <span class="ico">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-3.867 8.21 8.21 0 0 0 3 .004Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 3.75 3.75 0 0 0-1.993-2.343A3.75 3.75 0 0 0 12 18Z" /></svg>
-            </span>
-            <span><b>Isınma Rutini</b><small>10-15 dk · Her antrenmandan önce</small></span>
-            <span class="tag">ZORUNLU</span>
-        </button>
+        <!-- Son 4 hafta: hangi günler antrenman ve yürüyüş yapıldı -->
+        <section class="hist" id="hist" aria-label="Son 4 hafta"></section>
+
+        <div class="warm-row">
+            <button class="warmup-btn" id="openIsinmaModal">
+                <span class="ico">
+                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-3.867 8.21 8.21 0 0 0 3 .004Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 3.75 3.75 0 0 0-1.993-2.343A3.75 3.75 0 0 0 12 18Z" /></svg>
+                </span>
+                <span><b>Isınma Rutini</b><small>10-15 dk · Her antrenmandan önce</small></span>
+                <span class="tag">ZORUNLU</span>
+            </button>
+            <button class="warm-done" id="warmDone" aria-pressed="false" title="Bugün ısınmayı yaptım"></button>
+        </div>
 
         <!-- Gün sekmeleri -->
         <nav class="tabs-bar">
@@ -424,11 +468,13 @@
         <!-- Aktif gün -->
         <main id="dayView"></main>
 
-        <!-- Rehber -->
-        <h2 class="section-title">
+        <!-- Rehber (ilk haftalardan sonra yer kaplamasın diye katlanır) -->
+        <details class="guide-wrap" id="guideWrap">
+        <summary class="section-title">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
             Başarı İçin Rehber
-        </h2>
+            <span class="section-toggle"></span>
+        </summary>
         <div class="guide">
             <div class="g-card">
                 <h3>
@@ -439,7 +485,7 @@
                 <ol class="steps">
                     <li><i>1</i><span>Her sette <strong>2-3 tekrar daha yapabilecekken durun</strong> (RIR 2-3). Hiçbir seti tükenene kadar götürmeyin.</span></li>
                     <li><i>2</i><span>Tekrar aralığının üst sınırına (ör. 12) tüm setlerde rahatça ulaşınca ağırlığı <strong>1-2,5 kg</strong> artırın.</span></li>
-                    <li><i>3</i><span>Kullandığınız ağırlığı kartlardaki <strong>kg</strong> kutusuna yazın; bir sonraki sefer hatırlanır.</span></li>
+                    <li><i>3</i><span>Kartlardaki <strong>kg</strong> ve <strong>tekrar</strong> kutularına yazın. Tüm setleri bitirince uygulama bunu "geçen sefer" olarak saklar ve üst sınıra ulaştıysanız bir sonraki antrenmanda <strong>ağırlığı artırmanızı önerir</strong>.</span></li>
                 </ol>
             </div>
             <div class="g-card">
@@ -469,14 +515,14 @@
             <div class="g-card">
                 <h3>
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
-                    Kardiyo (Yağ Yakımı)
+                    Yürüyüş (Kalp ve Zihin)
                 </h3>
                 <div class="cardio">
                     <img src="runninng.jpg" alt="Tempolu yürüyüş" loading="lazy">
                     <div>
-                        <p><strong>1 Saat Tempolu Yürüyüş</strong></p>
-                        <p>Ağırlık antrenmanı yaptığınız 3 günün <strong class="hl">hemen sonrasında</strong>, konuşabileceğiniz bir tempoda. Yağ yakımı ve anksiyete için en etkili egzersizlerden biri.</p>
-                        <p>Dinlenme günlerinde <strong>30 dk sakin yürüyüş</strong> de ekleyebilirsiniz.</p>
+                        <p><strong>Antrenman sonrası 1 saat yürüyüş</strong></p>
+                        <p>Konuşabileceğiniz bir tempoda; nefesiniz kesiliyorsa yavaşlayın. Düzenli yürüyüş, kaygıyı azaltan ve kalbi koruyan en güvenli egzersizdir. Gün bitince <strong class="hl">"Yürüyüşü yaptım"</strong> ile işaretleyin, takvimde görünür.</p>
+                        <p>Vaktiniz yoksa 30 dk da değerlidir; dinlenme günlerinde kısa bir yürüyüş isteğe bağlıdır.</p>
                     </div>
                 </div>
             </div>
@@ -486,12 +532,14 @@
                     Kritik Notlar
                 </h3>
                 <div class="notes">
-                    <div class="note"><span class="dot"></span><span><strong class="hl">Beslenme:</strong> Program kasları "diri" hale getirir, ama üstündeki yağı eritmek %100 beslenmeyle ilgilidir. Mutlaka <strong>kalori açığı</strong> verin.</span></div>
+                    <div class="note"><span class="dot"></span><span><strong class="hl">Önce alışkanlık, sonra beslenme:</strong> (Helms) İlk hedef haftada 3 antrenmanı aksatmamak. Düzen oturduktan sonra <strong>küçük, sürdürülebilir</strong> beslenme değişiklikleri yeter; sert diyet ve kalori saplantısı gerekmez.</span></div>
                     <div class="note"><span class="dot"></span><span><strong class="hl">Form &gt; Ağırlık:</strong> (Athlean-X kuralı) Egoyu kapıda bırakın. Videodaki forma odaklanın, ağırlık zamanla artar.</span></div>
                     <div class="note"><span class="dot"></span><span><strong class="hl">Esneklik:</strong> Yorgunsanız veya formdan emin değilseniz <strong>Muadiller</strong> bölümündeki seçenekleri kullanın. Güvenlik önce gelir.</span></div>
+                    <div class="note"><span class="dot"></span><span><strong class="hl">Kötü gün:</strong> Kaygılı ya da uykusuz bir günde seti ve ağırlığı azaltıp yine de gelmek, hiç gelmemekten iyidir. Program sizin için var, siz program için değil.</span></div>
                 </div>
             </div>
         </div>
+        </details>
 
         <footer>
             Bu uygulama tıbbi tavsiye değildir; kalp ritmi şikâyetleriniz için doktorunuza danışın.<br>
@@ -577,7 +625,7 @@
 
         const DAYS = [
             {
-                id: 'fbA', short: 'A Günü', title: 'Gün A · Tüm Vücut', muscles: 'Bacak · Göğüs · Kanat · Yan Omuz · Arka Kol · Karın',
+                id: 'fbA', short: 'A Günü', title: 'Gün A · Tüm Vücut', muscles: 'Bacak · Göğüs · Kanat · Yan Omuz · Arka Kol · Karın · Baldır',
                 weekday: 1, weekdayName: 'Pazartesi', color: { light: '#ea580c', dark: '#fb923c' },
                 exercises: [
                     { name: 'Leg Press', target: 'Bacak', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
@@ -603,11 +651,15 @@
                     { name: 'Lying Leg Raise', target: 'Alt Karın', img: 'f1/lrase.gif', video: ys('ZyE4r7wiI6w'),
                       sets: 2, reps: '10-15', rest: 120, noWeight: true,
                       tip: 'Belinizi yere bastırın. Bacakları savurmadan, alt karınla yavaşça kaldırıp indirin. Zorlanırsanız dizleri bükün.',
-                      alts: [['Dead Bug', ysearch('dead bug exercise form'), 'En güvenli karın hareketi, bele yük yok', 'Dead-Bug.gif']] }
+                      alts: [['Dead Bug', ysearch('dead bug exercise form'), 'En güvenli karın hareketi, bele yük yok', 'Dead-Bug.gif']] },
+                    { name: 'Standing Calf Raise', target: 'Baldır', img: '', video: ysearch('standing calf raise machine form'),
+                      sets: 2, reps: '12-15', rest: 90,
+                      tip: 'Makinede ya da bir basamakta. Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Yürüyüş programınız için baldır ve aşil güvenliği.',
+                      alts: [['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', ''], ['Basamakta Vücut Ağırlığı', ysearch('bodyweight calf raise step'), 'Ağırlıksız, her yerde', '']] }
                 ]
             },
             {
-                id: 'fbB', short: 'B Günü', title: 'Gün B · Tüm Vücut', muscles: 'Bacak · Üst Göğüs · Sırt · Arka Omuz · Arka Bacak · Pazu',
+                id: 'fbB', short: 'B Günü', title: 'Gün B · Tüm Vücut', muscles: 'Bacak · Üst Göğüs · Sırt · Arka Omuz · Arka Bacak · Pazu · Yan Kalça',
                 weekday: 3, weekdayName: 'Çarşamba', color: { light: '#0e7490', dark: '#22d3ee' },
                 exercises: [
                     { name: 'Dumbbell Goblet Squat', target: 'Bacak · Kalça', img: 'Dumbbell-Goblet-Squat.gif', video: ysearch('dumbbell goblet squat form'),
@@ -633,11 +685,15 @@
                     { name: 'Dumbbell Biceps Curl', target: 'Pazu', img: 'f1/Flexor-Incline-Dumbbell-Curls.gif', video: ys('MKWBV29S6c0'),
                       sets: 2, reps: '10-12', rest: 120,
                       tip: 'Vücudu sallamayın. Kaldırırken nefes verin, indirirken yavaş olun.',
-                      alts: [['Cable Biceps Curl', ysearch('cable biceps curl form'), 'Sürekli gerginlik', 'cablebicepscurl.gif'], ['Preacher Curl', ys('0y4tdUNPdlE'), 'Tam izole, sallanma yok', 'f1/ez-bar-preacher-curl-exercise.gif']] }
+                      alts: [['Cable Biceps Curl', ysearch('cable biceps curl form'), 'Sürekli gerginlik', 'cablebicepscurl.gif'], ['Preacher Curl', ys('0y4tdUNPdlE'), 'Tam izole, sallanma yok', 'f1/ez-bar-preacher-curl-exercise.gif']] },
+                    { name: 'Hip Abduction', target: 'Yan Kalça', img: '', video: ysearch('hip abduction machine form'),
+                      sets: 2, reps: '12-15', rest: 90,
+                      tip: 'Makinede ya da dizlerin üstünde lastikle. Yavaş açın, 1 sn tutun. Diz sağlığı ve yürürken denge için.',
+                      alts: [['Banded Clamshell', ysearch('banded clamshell exercise'), 'Yerde yan yatarak, lastikle', ''], ['Side-Lying Leg Raise', ysearch('side lying leg raise form'), 'Ağırlıksız', '']] }
                 ]
             },
             {
-                id: 'fbC', short: 'C Günü', title: 'Gün C · Tüm Vücut', muscles: 'Ön Bacak · Kalça/Bel · Omuz · Sırt · Pazu · Kor',
+                id: 'fbC', short: 'C Günü', title: 'Gün C · Tüm Vücut', muscles: 'Ön Bacak · Kalça/Bel · Omuz · Sırt · Baldır · Kor',
                 weekday: 5, weekdayName: 'Cuma', color: { light: '#4d7c0f', dark: '#a3e635' },
                 exercises: [
                     { name: 'Leg Extension', target: 'Ön Bacak', img: 'LEG-EXTENSION.gif', video: ys('iQ92TuvBqRo'),
@@ -656,10 +712,10 @@
                       sets: 3, reps: '10-12 (her kol)', rest: 120,
                       tip: 'Elinizi ve dizinizi sehpaya dayayın. Dambılı kalçanıza doğru çekin, vücudu döndürmeyin.',
                       alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Göğüs destekli, beli korur', 'f1/dumbbell-chest-supported-row-exercise.gif']] },
-                    { name: 'Hammer Curl', target: 'Pazu / Ön Kol', img: 'f1/Seated-Hammer-Curl.gif', video: ys('_aoad2yuP5w'),
-                      sets: 2, reps: '10-12', rest: 120,
-                      tip: 'Avuç içleri birbirine bakar. Oturarak yapmak sallanmayı önler.',
-                      alts: [['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
+                    { name: 'Standing Calf Raise', target: 'Baldır', img: '', video: ysearch('standing calf raise machine form'),
+                      sets: 2, reps: '12-15', rest: 90,
+                      tip: 'Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Haftada iki kez baldır, yürüyüşte aşil ve diz dostu.',
+                      alts: [['Hammer Curl (kol isterseniz)', ys('_aoad2yuP5w'), 'Avuç içleri karşılıklı, oturarak', 'f1/Seated-Hammer-Curl.gif'], ['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
                     { name: 'Plank (kısa süreli)', target: 'Tüm Kor', img: 'f2/Weighted-Front-Plank.gif', video: ys('xe2MXatLTUw'),
                       sets: 3, reps: '20-30 sn', rest: 120, noWeight: true,
                       breath: 'Nefesi tutmayın! Plank boyunca sakin ve düzenli nefes alıp verin. Ağırlık koymadan yapın.',
@@ -673,7 +729,7 @@
     <!-- UYGULAMA -->
     <script>
         // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
-        const APP_VERSION = { number: 13, date: '31 Ekim 2026' };
+        const APP_VERSION = { number: 15, date: '1 Kasım 2026' };
         (async () => {
             const el = document.getElementById('appVersion');
             el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
@@ -698,8 +754,12 @@
             reps: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>',
             chevron: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>',
             wind: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/></svg>',
-            reset: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/></svg>'
+            reset: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/></svg>',
+            up: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>',
+            history: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>',
+            walk: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm-3 17 2-6m-3-2 2-5 3 1 3 4m-6-5-3 2-1 4m5-4 1 4 3 3"/></svg>'
         };
+        document.getElementById('statMoves').textContent = DAYS.reduce((n, d) => n + d.exercises.length, 0);
 
         // --- Yerel depolama (hata verirse sessizce yoksay) ---
         const store = {
@@ -750,10 +810,61 @@
             ? `Bugün: ${todayDay.short} günü`
             : `Bugün dinlenme · Sıradaki: ${nextDay.weekdayName} (${nextDay.short})`;
 
-        // Antrenman günüyse o gün açılır; değilse son bakılan gün (yoksa sıradaki).
-        const savedId = store.get('activeDay', null);
-        let activeId = todayDay ? todayDay.id
-            : DAYS.some(d => d.id === savedId) ? savedId : nextDay.id;
+        // Antrenman günüyse o gün, dinlenme günüyse sıradaki gün açılır (pill ile tutarlı).
+        let activeId = (todayDay || nextDay).id;
+
+        // --- Isınma işareti (günlük) ---
+        const warmBtn = document.getElementById('warmDone');
+        const warmKey = () => 'warm:' + todayKey();
+        const warmDone = () => !!store.get(warmKey(), false);
+        function paintWarm() {
+            warmBtn.setAttribute('aria-pressed', warmDone());
+            warmBtn.innerHTML = warmDone() ? '✓<br>Isındım' : 'Isındım<br>mı?';
+        }
+        warmBtn.addEventListener('click', () => {
+            store.set(warmKey(), !warmDone());
+            paintWarm();
+            const day = DAYS.find(d => d.id === activeId);
+            updateProgress(day, store.get('last:' + day.id, null));
+        });
+        paintWarm();
+
+        // --- Son 4 hafta takvimi ---
+        function renderHist() {
+            const t = new Date(); t.setHours(12, 0, 0, 0);
+            let trained = 0, walks = 0;
+            const cells = [];
+            for (let k = 27; k >= 0; k--) {
+                const d = new Date(t); d.setDate(t.getDate() - k);
+                const h = store.get('hist:' + d.toLocaleDateString('sv-SE'), null);
+                const day = h && DAYS.find(x => x.id === h.day);
+                if (h) { trained++; if (h.walk) walks++; }
+                const title = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' }) + (h ? ` · ${day ? day.short : 'Antrenman'}${h.walk ? ' + yürüyüş' : ''}` : '');
+                cells.push(`<span class="hist-day${h ? ' train' : ''}${h && h.walk ? ' walk' : ''}${k === 0 ? ' today' : ''}" style="--dc:${day ? dayColor(day) : 'var(--accent)'}" title="${title}"></span>`);
+            }
+            document.getElementById('hist').innerHTML = `
+                <div class="hist-top"><span>Son 4 hafta</span><span><b>${trained}</b> antrenman · <b>${walks}</b> yürüyüş</span></div>
+                <div class="hist-grid">${cells.join('')}</div>
+                <div class="hist-legend"><span><i style="background:var(--accent)"></i>Antrenman</span><span><i style="background:var(--accent);box-shadow:inset -3px -3px 0 0 #fff"></i>+ yürüyüş</span><span><i style="background:var(--surface-3)"></i>Boş</span></div>`;
+            return trained;
+        }
+        // Rehber ilk haftalarda açık gelsin, program oturunca katlansın
+        document.getElementById('guideWrap').open = renderHist() < 3;
+
+        // --- Geçen sefer / çift yükseltme ---
+        const repsMax = ex => { const m = String(ex.reps).match(/(\d+)\s*-\s*(\d+)/); return m ? +m[2] : null; };
+        const fmtKg = n => String(Math.round(n * 2) / 2).replace('.', ',');
+        function prevLine(day, ex, i) {
+            const p = store.get(`prev:${day.id}:${i}`, null);
+            if (!p) return '';
+            const what = [p.w ? `${p.w} kg` : '', p.r ? `${p.r} ${ex.noWeight ? '' : 'tekrar'}`.trim() : ''].filter(Boolean).join(' × ');
+            if (!what) return '';
+            const max = repsMax(ex);
+            const up = !ex.noWeight && +p.w > 0 && max && +p.r >= max;
+            const when = new Date(p.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+            const step = +p.w >= 40 ? 5 : +p.w >= 15 ? 2.5 : 1;
+            return `<p class="prev${up ? ' up' : ''}">${up ? ICON.up : ICON.history}<span>Geçen sefer (${when}): <b>${esc(what)}</b>${up ? ` · üst sınıra ulaştınız, bugün <b>${fmtKg(+p.w + step)} kg</b> deneyin` : ''}</span></p>`;
+        }
 
         // --- Sekmeler ---
         const tabsEl = document.getElementById('tabs');
@@ -786,6 +897,7 @@
             document.documentElement.style.setProperty('--accent', dayColor(day));
             document.documentElement.style.setProperty('--accent-soft', dayColor(day) + (theme() === 'dark' ? '24' : '1c'));
             renderTabs();
+            renderHist();
 
             const lastDone = store.get('last:' + day.id, null);
             view.innerHTML = `
@@ -805,6 +917,7 @@
                     </div>
                     <div class="day-foot">
                         <span id="progressTxt"></span>
+                        <span id="walkSlot"></span>
                         <button class="ghost-btn" id="resetDay">${ICON.reset} Sıfırla</button>
                     </div>
                 </section>
@@ -816,6 +929,7 @@
 
         function cardHTML(day, ex, i, done) {
             const w = store.get(`w:${day.id}:${i}`, '');
+            const r = store.get(`r:${day.id}:${i}`, '');
             const sets = setsOf(ex);
             const allDone = sets.every(s => done.has(`${i}-${s}`));
             return `
@@ -841,11 +955,13 @@
                     </div>
                     <p class="tip">${esc(ex.tip)}</p>
                     <p class="breath">${ICON.wind} ${esc(ex.breath || 'Kaldırırken / iterken nefes verin, indirirken nefes alın. Nefesi tutmayın.')}</p>
+                    ${prevLine(day, ex, i)}
                     <div class="tracker">
                         <div class="set-btns">
                             ${sets.map(s => `<button class="set-btn${s === 'B' ? ' bo' : ''}" data-set="${s}" aria-pressed="${done.has(`${i}-${s}`)}" title="${s === 'B' ? 'Back-off set' : s + '. set'}">${s === 'B' ? 'B-off' : s}</button>`).join('')}
                         </div>
                         ${ex.noWeight ? '' : `<label class="weight">Ağırlık <input type="number" inputmode="decimal" step="0.5" min="0" placeholder="—" value="${esc(w)}" data-w> kg</label>`}
+                        <label class="weight reps" title="Son sette kaç tekrar / saniye yaptınız?">${ex.noWeight ? 'Tekrar / sn' : 'Tekrar'} <input type="number" inputmode="numeric" min="0" placeholder="—" value="${esc(r)}" data-r></label>
                     </div>
                     <details class="alts">
                         <summary>${ICON.chevron} Muadiller (${ex.alts.length})</summary>
@@ -860,17 +976,31 @@
         function updateProgress(day, lastDone) {
             const done = getDone(day.id);
             const total = totalSets(day);
-            const pct = Math.round(done.size / total * 100);
+            const setsDone = done.size === total;
+            // Halka: setler + ısınma (ısınma da günün parçası)
+            const frac = (done.size + (warmDone() ? 1 : 0)) / (total + 1);
+            const pct = Math.round(frac * 100);
             const ring = document.getElementById('ringFill');
-            ring.style.strokeDashoffset = 169.6 * (1 - done.size / total);
-            ring.setAttribute('stroke', pct === 100 ? 'var(--green)' : 'var(--accent)');
+            ring.style.strokeDashoffset = 169.6 * (1 - frac);
+            ring.setAttribute('stroke', setsDone ? 'var(--green)' : 'var(--accent)');
             document.getElementById('ringTxt').textContent = pct + '%';
-            const last = lastDone ? ` · Son tamamlama: ${new Date(lastDone).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}` : '';
-            document.getElementById('progressTxt').textContent = pct === 100
-                ? 'Harika! Bugünkü antrenman tamamlandı 💪 Şimdi 1 saat yürüyüş.'
-                : `${done.size} / ${total} set tamamlandı${last}`;
+            const last = lastDone ? ` · Son: ${new Date(lastDone).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}` : '';
+            document.getElementById('progressTxt').textContent = setsDone
+                ? 'Harika! Bugünkü antrenman tamamlandı 💪 Şimdi sakin bir yürüyüş.'
+                : `${done.size} / ${total} set · ısınma ${warmDone() ? '✓' : '–'}${last}`;
+            const h = store.get('hist:' + todayKey(), null);
+            document.getElementById('walkSlot').innerHTML = setsDone
+                ? `<button class="walk-btn" id="walkBtn" aria-pressed="${!!(h && h.walk)}">${ICON.walk} ${h && h.walk ? 'Yürüyüş yapıldı' : 'Yürüyüşü yaptım'}</button>` : '';
             const bar = tabsEl.querySelector(`[data-id="${day.id}"] .t-bar`);
-            if (bar) bar.style.width = pct + '%';
+            if (bar) bar.style.width = Math.round(done.size / total * 100) + '%';
+        }
+        // Günü bitirince takvime yaz; bitmediyse (işaret geri alındıysa) sil
+        function recordDay(day, finished) {
+            const key = 'hist:' + todayKey();
+            const h = store.get(key, null);
+            if (finished) store.set(key, { day: day.id, walk: !!(h && h.walk) });
+            else if (h && h.day === day.id) store.set(key, null);
+            renderHist();
         }
 
         view.addEventListener('click', e => {
@@ -888,7 +1018,11 @@
                 setBtn.setAttribute('aria-pressed', on);
                 const allDone = setsOf(ex).every(s => done.has(`${i}-${s}`));
                 card.classList.toggle('done', allDone);
-                if (done.size === totalSets(day)) store.set('last:' + day.id, todayKey());
+                // Hareket bitince bugünkü kilo/tekrar "geçen sefer" olarak saklanır (çift yükseltme önerisi için)
+                if (allDone) store.set(`prev:${day.id}:${i}`, { date: todayKey(), w: store.get(`w:${day.id}:${i}`, ''), r: store.get(`r:${day.id}:${i}`, '') });
+                const finished = done.size === totalSets(day);
+                if (finished) store.set('last:' + day.id, todayKey());
+                recordDay(day, finished);
                 updateProgress(day, store.get('last:' + day.id, null));
                 if (on) {
                     if (navigator.vibrate) navigator.vibrate(30);
@@ -906,17 +1040,34 @@
                 timer.start(+restBtn.dataset.rest, ex.name);
                 return;
             }
+            const walk = e.target.closest('#walkBtn');
+            if (walk) {
+                const key = 'hist:' + todayKey();
+                const h = store.get(key, null) || { day: day.id };
+                store.set(key, { ...h, walk: !h.walk });
+                renderHist();
+                updateProgress(day, store.get('last:' + day.id, null));
+                return;
+            }
             const reset = e.target.closest('#resetDay');
-            if (reset && confirm(`${day.short} gününün set işaretleri sıfırlansın mı? (Ağırlıklar korunur)`)) {
+            if (reset) {
+                // confirm() yüklü PWA'da bazı tarayıcılarda görünmüyor: iki dokunuşla onay
+                if (!reset.classList.contains('confirm')) {
+                    reset.classList.add('confirm');
+                    reset.innerHTML = 'Emin misiniz? Sıfırla';
+                    setTimeout(() => { if (reset.isConnected) { reset.classList.remove('confirm'); reset.innerHTML = `${ICON.reset} Sıfırla`; } }, 4000);
+                    return;
+                }
                 saveDone(day.id, new Set());
+                recordDay(day, false);
                 timer.stop();
                 render();
             }
         });
         view.addEventListener('input', e => {
-            if (!e.target.matches('[data-w]')) return;
-            const i = e.target.closest('.ex').dataset.i;
-            store.set(`w:${activeId}:${i}`, e.target.value);
+            const i = e.target.closest('.ex')?.dataset.i;
+            if (e.target.matches('[data-w]')) store.set(`w:${activeId}:${i}`, e.target.value);
+            else if (e.target.matches('[data-r]')) store.set(`r:${activeId}:${i}`, e.target.value);
         });
 
         // --- Dinlenme zamanlayıcısı ---
@@ -955,15 +1106,30 @@
                     hideT = setTimeout(stop, 6000);
                 }
             }
-            function start(sec, label) {
-                clearTimeout(hideT); clearInterval(tick);
-                total = sec; end = Date.now() + sec * 1000;
+            function show(label) {
                 el.classList.remove('finished');
                 stateEl.textContent = 'Dinlenme';
                 nameEl.textContent = label || '';
                 el.classList.add('show');
+                document.body.classList.add('timer-open');
+            }
+            function start(sec, label) {
+                clearTimeout(hideT); clearInterval(tick);
+                total = sec; end = Date.now() + sec * 1000;
+                store.set('timer', { end, total, label }); // ekran kilitlenince / sayfa yenilenince sayaç kaybolmasın
+                show(label);
                 update();
                 tick = setInterval(update, 250);
+            }
+            // Sayfa açılırken kalan bir dinlenme varsa sürdür
+            function resume() {
+                const t = store.get('timer', null);
+                if (!t) return;
+                if (Date.now() - t.end > 120000) { store.set('timer', null); return; }
+                total = t.total; end = t.end;
+                show(t.label);
+                update();
+                if (end > Date.now()) tick = setInterval(update, 250);
             }
             function adjust(d) {
                 if (!tick) {
@@ -974,10 +1140,15 @@
                 end += d * 1000; total = Math.max(total + d, 1);
                 update();
             }
-            function stop() { clearTimeout(hideT); clearInterval(tick); tick = null; el.classList.remove('show'); }
+            function stop() {
+                clearTimeout(hideT); clearInterval(tick); tick = null;
+                el.classList.remove('show'); document.body.classList.remove('timer-open');
+                store.set('timer', null);
+            }
             document.getElementById('timerPlus').onclick = () => adjust(15);
             document.getElementById('timerMinus').onclick = () => adjust(-15);
             document.getElementById('timerSkip').onclick = stop;
+            resume();
             return { start, stop };
         })();
 
