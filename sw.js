@@ -1,4 +1,6 @@
-const CACHE_NAME = 'idman-app-v18'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+const CACHE_NAME = 'idman-app-v19'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+// Sayfa isteği bu süreden uzun sürerse önbellekteki sayfa açılır
+const NAV_TIMEOUT = 2500;
 // Ana dosyalar
 const urlsToCache = [
   './',
@@ -27,19 +29,13 @@ const imageUrls = [
     './Seated-Leg-Curl.gif',
     './Glute-Bridge.gif',
     './Machine-Shoulder-Press.gif',
-    './Standing-Calf-Raise.gif',
-    './Machine-Calf-Raise.gif',
-    './Seated-Calf-Raise.gif',
-    './Single-Leg-Calf-Raise.gif',
     './Hip-Abduction.gif',
     './Side-Lying-Leg-Raise.gif',
     './Banded-Clamshell.jpg',
     // Hareket ve muadil GIF'leri (index.html'deki DAYS listesiyle aynı tutun)
     './Leg-Press.gif',
-    './Dumbbell-Goblet-Squat.gif',
     './LEG-EXTENSION.gif',
     './Dumbbell-Romanian-Deadlift.gif',
-    './Barbell-Good-Morning.gif',
     './cablebicepscurl.gif',
     './f1/Lat-Pulldown.gif',
     './f1/neutral Lat-Pulldown.gif',
@@ -98,17 +94,27 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Sayfanın kendisi için "Network First": güncellemeler hemen görünür, çevrimdışıyken önbellek kullanılır
+  // Sayfanın kendisi: önce ağ, ama en fazla NAV_TIMEOUT ms. Ağ zayıfsa (salonda tek çizgi) önbellekteki
+  // sayfa hemen açılır; ağ isteği arka planda sürer ve gelince önbelleği günceller (bir sonraki açılışta yeni sürüm).
+  // Zaman sınırı yokken zayıf ağda uygulama logoda 20-40 sn bekliyordu.
   if (event.request.mode === 'navigate') {
+    const network = fetch(event.request).then(async res => {
+      if (res.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(event.request, res.clone());
+      }
+      return res;
+    });
+    event.waitUntil(network.catch(() => {}));
     event.respondWith(
       (async () => {
+        const cached = (await caches.match(event.request)) || (await caches.match('./index.html'));
+        if (!cached) return network; // ilk kurulumdan önce önbellek boş: ağı bekle
+        const timeout = new Promise(resolve => setTimeout(() => resolve(cached), NAV_TIMEOUT));
         try {
-          const networkResponse = await fetch(event.request);
-          const cache = await caches.open(CACHE_NAME);
-          await cache.put(event.request, networkResponse.clone());
-          return networkResponse;
+          return await Promise.race([network, timeout]);
         } catch (error) {
-          return (await caches.match(event.request)) || (await caches.match('./index.html'));
+          return cached;
         }
       })()
     );

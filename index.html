@@ -39,8 +39,6 @@
         });
       }
     </script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* Açık tema (varsayılan) */
         :root {
@@ -96,7 +94,7 @@
         html { -webkit-text-size-adjust: 100%; }
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; /* dış yazı tipi yok: açılışı ağa bağlamasın */
             background: var(--bg);
             background-image: radial-gradient(1200px 500px at 50% -200px, var(--accent-soft), transparent 70%);
             background-repeat: no-repeat;
@@ -501,7 +499,8 @@
                 </h3>
                 <p>Kas gelişimi için "Aşamalı Yüklenme" şarttır, ama <strong>yavaş ve sakin</strong>. <strong class="hl">"Çift Yükseltme"</strong> metodunu kullanın:</p>
                 <ol class="steps">
-                    <li><i>1</i><span>Her sette <strong>2-3 tekrar daha yapabilecekken durun</strong> (RIR 2-3). Hiçbir seti tükenene kadar götürmeyin.</span></li>
+                    <li><i>1</i><span>Her sette <strong>2-3 tekrar daha yapabilecekken durun</strong> (RIR 2-3). Hiçbir seti tükenene kadar götürmeyin; tükenişe giden setler tansiyonu belirgin şekilde daha çok yükseltir.</span></li>
+                    <li><i>★</i><span><strong>İlk 3 hafta:</strong> her harekette 2 set yeterli (gün başlığındaki <strong>Hafif gün</strong> anahtarı bunu yapar). Yeni başlayanda az set de kas kazandırır; önce form ve alışkanlık.</span></li>
                     <li><i>2</i><span>Tekrar aralığının üst sınırına (ör. 12) tüm setlerde rahatça ulaşınca ağırlığı <strong>1-2,5 kg</strong> artırın.</span></li>
                     <li><i>3</i><span>Kartlardaki <strong>kg</strong> ve <strong>tekrar</strong> kutularına yazın. Tüm setleri bitirince uygulama bunu "geçen sefer" olarak saklar ve üst sınıra ulaştıysanız bir sonraki antrenmanda <strong>ağırlığı artırmanızı önerir</strong>.</span></li>
                 </ol>
@@ -525,8 +524,8 @@
                 </h3>
                 <p>Bir seti işaretlediğinizde dinlenme sayacı otomatik başlar. Süreler kalbi zorlamamak için bilerek uzun tutuldu.</p>
                 <div class="rest-rows">
-                    <div class="rest-row">Bacak & kalça (Leg Press, Squat, RDL) <b>2,5 dk</b></div>
-                    <div class="rest-row">Diğer tüm hareketler <b>2 dk</b></div>
+                    <div class="rest-row">Leg Press <b>2,5 dk</b></div>
+                    <div class="rest-row">Diğer büyük hareketler <b>2 dk</b> · küçük hareketler <b>1,5 dk</b></div>
                     <div class="rest-row">Hazır hissetmiyorsanız <b>+15 sn uzatın</b></div>
                 </div>
             </div>
@@ -642,15 +641,20 @@
         const ys = id => 'https://www.youtube.com/shorts/' + id;
         const ysearch = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
 
+        // Program (Sürüm 19): her gün tek ana bacak hareketi, makine ağırlıklı, gün başına 6 hareket / ~15 set.
+        // Dayanak: AHA 2023 (Paluch) 8-10 hareket, 8-12/10-15 tekrar, %40-60 1RM; ACSM 2009 yeni başlayana haftada 2-3 tam vücut;
+        // Ramos-Campo 2024: hacim eşitken tam vücut = bölgesel. Bacak presi kan basıncını en çok yükselten hareket olduğundan
+        // haftada bir kez ve hafif; diğer günlerde oturarak yapılan tek eklemli bacak makineleri.
         const DAYS = [
             {
-                id: 'fbA', short: 'A Günü', title: 'Gün A · Tüm Vücut', muscles: 'Bacak · Göğüs · Kanat · Yan Omuz · Arka Kol · Karın · Baldır',
+                id: 'fbA', short: 'A Günü', title: 'Gün A · Tüm Vücut', muscles: 'Bacak · Göğüs · Kanat · Yan Omuz · Arka Kol · Karın',
                 weekday: 1, weekdayName: 'Pazartesi', color: { light: '#ea580c', dark: '#fb923c' },
                 exercises: [
-                    { name: 'Leg Press', target: 'Bacak', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
-                      sets: 3, reps: '10-15', rest: 150,
-                      tip: 'Ayaklar omuz genişliğinde. İndirirken kalçanızın kalkmamasına dikkat edin, dizleri tam kilitlemeyin.',
-                      alts: [['Dumbbell Goblet Squat', ysearch('dumbbell goblet squat form'), 'Hafif dambılla, dengeli', 'Dumbbell-Goblet-Squat.gif'], ['Hack Squat Machine', ys('dJcCdRH_2i8'), 'Squat hissi, sırt destekli', 'Hack-Squat.gif']] },
+                    { name: 'Leg Press', target: 'Bacak · Kalça', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
+                      sets: 3, reps: '12-15', rest: 150,
+                      tip: 'Haftanın tek bileşik bacak hareketi: HAFİF tutun, 15 tekrarı rahat yapabileceğiniz ağırlık. Ayaklar omuz genişliğinde, kalça sehpadan kalkmasın, dizleri en üstte kilitlemeyin.',
+                      breath: 'İterken nefes verin, indirirken alın. Bu harekette nefes tutmak tansiyonu en çok yükseltir: tekrarları sesli sayın.',
+                      alts: [['Leg Extension', ys('iQ92TuvBqRo'), 'Nabzı daha az yükseltir; kötü günde bunu seçin', 'LEG-EXTENSION.gif'], ['Hack Squat Machine', ys('dJcCdRH_2i8'), 'Sırt destekli; ilk 2 ayda değil', 'Hack-Squat.gif']] },
                     { name: 'Machine Chest Press', target: 'Göğüs', img: 'f2/Chest-Press-Machine.gif', video: yt('Qu7-ceCvq7w'),
                       sets: 3, reps: '10-12', rest: 120,
                       tip: 'Sırtınızı sehpaya yaslayın, kürek kemiklerini hafifçe geriye toplayın. Makine yolu sabit olduğu için dengeyle uğraşmazsınız.',
@@ -660,31 +664,28 @@
                       tip: 'Barı göğsünüzün üstüne çekin, dirsekleri aşağı ve geriye götürün. Gövdeyi sallamayın.',
                       alts: [['Neutral Grip Lat Pulldown', ysearch('neutral grip lat pulldown form'), 'Paralel tutuş, omuz dostu', 'f1/neutral Lat-Pulldown.gif']] },
                     { name: 'Dumbbell Lateral Raise', target: 'Yan Omuz', img: 'Dumbbell-Lateral-Raise.gif', video: yt('Kl3LEzQ5Zqs'),
-                      sets: 2, reps: '12-15', rest: 120,
-                      tip: 'Hafif ağırlık kullanın. Omuz hizasını geçmeyin. Hareketi yavaş ve kontrollü yapın.',
+                      sets: 2, reps: '12-15', rest: 90,
+                      tip: 'Hafif ağırlık kullanın, oturarak da yapabilirsiniz. Omuz hizasını geçmeyin; yavaş ve kontrollü.',
                       alts: [['Cable Lateral Raise', yt('9ilIKuy6B0g'), 'Sürekli gerginlik sağlar', 'Cable-Lateral-Raise.gif']] },
                     { name: 'Triceps Pushdown', target: 'Arka Kol · Kablo', img: 'f1/One-arm-triceps-pushdown.gif', video: yt('1FjkhpZsaxc'),
-                      sets: 2, reps: '12-15', rest: 120,
+                      sets: 2, reps: '12-15', rest: 90,
                       tip: 'Dirsekler yanda sabit kalsın. Sadece dirsekten bükün ve en altta 1 sn sıkıştırın.',
                       alts: [['Overhead Cable Extension', yt('oZ1MbUl-_-w'), 'Arka kolun uzun başı', 'f1/High-Pulley-Overhead-Tricep-Extension.gif']] },
-                    { name: 'Lying Leg Raise', target: 'Alt Karın', img: 'f1/lrase.gif', video: ys('ZyE4r7wiI6w'),
-                      sets: 2, reps: '10-15', rest: 120, noWeight: true,
-                      tip: 'Belinizi yere bastırın. Bacakları savurmadan, alt karınla yavaşça kaldırıp indirin. Zorlanırsanız dizleri bükün.',
-                      alts: [['Dead Bug', ysearch('dead bug exercise form'), 'En güvenli karın hareketi, bele yük yok', 'Dead-Bug.gif']] },
-                    { name: 'Standing Calf Raise', target: 'Baldır', img: 'Standing-Calf-Raise.gif', video: ysearch('standing calf raise machine form'),
-                      sets: 2, reps: '12-15', rest: 90,
-                      tip: 'Basamakta ya da makinede. Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Yürüyüş programınız için baldır ve aşil güvenliği.',
-                      alts: [['Machine Calf Raise', ysearch('standing calf raise machine form'), 'Makinede, omuz yastıklı', 'Machine-Calf-Raise.gif'], ['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', 'Seated-Calf-Raise.gif'], ['Tek Bacak Calf Raise (yükseltide)', ysearch('single leg calf raise step'), 'Ağırlıksız ya da hafif dambılla', 'Single-Leg-Calf-Raise.gif']] }
+                    { name: 'Dead Bug', target: 'Karın · Kor', img: 'Dead-Bug.gif', video: ysearch('dead bug exercise form'), noWeight: true,
+                      sets: 2, reps: '8-10 (her taraf)', rest: 90,
+                      breath: 'Kol ve bacağı uzatırken nefes verin. Bel yerden kalkmasın; nefes tutmadan, yavaş.',
+                      tip: 'Sırtüstü, dizler 90°. Karşı kol ve bacağı yere yaklaştırıp geri getirin. Bele yük bindirmeyen, nabzı yükseltmeyen en güvenli karın hareketi.',
+                      alts: [['Lying Leg Raise', ys('ZyE4r7wiI6w'), 'Daha zor; belde his olursa bırakın', 'f1/lrase.gif']] }
                 ]
             },
             {
-                id: 'fbB', short: 'B Günü', title: 'Gün B · Tüm Vücut', muscles: 'Bacak · Üst Göğüs · Sırt · Arka Omuz · Arka Bacak · Pazu · Yan Kalça',
+                id: 'fbB', short: 'B Günü', title: 'Gün B · Tüm Vücut', muscles: 'Arka Bacak · Yan Kalça · Üst Göğüs · Sırt · Arka Omuz · Pazu',
                 weekday: 3, weekdayName: 'Çarşamba', color: { light: '#0e7490', dark: '#22d3ee' },
                 exercises: [
-                    { name: 'Dumbbell Goblet Squat', target: 'Bacak · Kalça', img: 'Dumbbell-Goblet-Squat.gif', video: ysearch('dumbbell goblet squat form'),
-                      sets: 3, reps: '10-12', rest: 150,
-                      tip: 'Dambılı göğsünüze yakın tutun, gövde dik. Rahat inebildiğiniz derinliğe kadar inin; zorlamayın.',
-                      alts: [['Leg Press', ys('EotSw18oR9w'), 'Sırt destekli, daha güvenli', 'Leg-Press.gif']] },
+                    { name: 'Seated Leg Curl', target: 'Arka Bacak', img: 'Seated-Leg-Curl.gif', video: ys('yJ_KpXrN8hs'),
+                      sets: 3, reps: '12-15', rest: 120,
+                      tip: 'Oturarak, sırt destekli: nabzı en az yükselten bacak hareketlerinden. Topukları aşağı çekerken sıkıştırın, yavaşça bırakın.',
+                      alts: [['Lying Leg Curl', ys('FRy58-v0YII'), 'Yüzüstü; salonda oturmalı yoksa', 'f1/LEG_CURL.gif']] },
                     { name: 'Incline Dumbbell Press', target: 'Üst Göğüs', img: 'f1/Incline-Dumbbell-Press.gif', video: yt('8fXfwG4ftaQ'),
                       sets: 3, reps: '10-12', rest: 120,
                       tip: 'Sehpa 30° civarında olsun. Dambılları köprücük kemiğinizin altına doğru kontrollü indirin.',
@@ -694,52 +695,48 @@
                       tip: 'Belden değil, sırttan çekin. Çekiş anında kürek kemiklerini birleştirin, gövde sabit kalsın.',
                       alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Göğüs destekli, beli korur', 'f1/dumbbell-chest-supported-row-exercise.gif']] },
                     { name: 'Face Pull', target: 'Arka Omuz · Kablo', img: 'f1/Face-Pull.gif', video: yt('IeOqdw9WI90'),
-                      sets: 2, reps: '15', rest: 120,
+                      sets: 2, reps: '15', rest: 90,
                       tip: '(Athlean-X favorisi) Baş parmaklar geriyi gösterecek şekilde halatı yüzünüze çekin. Duruş ve omuz sağlığı için.',
                       alts: [['Reverse Pec Deck / Cable Rear Delt Fly', ys('-TKqxK7-ehc'), 'Arka omuz, tam izole', 'f1/cable-rear-delt-fly.gif']] },
-                    { name: 'Lying Leg Curl', target: 'Arka Bacak', img: 'f1/LEG_CURL.gif', video: ys('FRy58-v0YII'),
-                      sets: 2, reps: '12-15', rest: 120,
-                      tip: 'Kalçanızı sehpaya bastırın. Topukları kalçaya çekerken sıkıştırın, yavaşça bırakın.',
-                      alts: [['Seated Leg Curl', ys('yJ_KpXrN8hs'), 'Oturarak, farklı açı', 'Seated-Leg-Curl.gif']] },
                     { name: 'Dumbbell Biceps Curl', target: 'Pazu', img: 'f1/Flexor-Incline-Dumbbell-Curls.gif', video: ys('MKWBV29S6c0'),
-                      sets: 2, reps: '10-12', rest: 120,
-                      tip: 'Vücudu sallamayın. Kaldırırken nefes verin, indirirken yavaş olun.',
+                      sets: 2, reps: '10-12', rest: 90,
+                      tip: 'Oturarak yapın, vücudu sallamayın. Kaldırırken nefes verin, indirirken yavaş olun.',
                       alts: [['Cable Biceps Curl', ysearch('cable biceps curl form'), 'Sürekli gerginlik', 'cablebicepscurl.gif'], ['Preacher Curl', ys('0y4tdUNPdlE'), 'Tam izole, sallanma yok', 'f1/ez-bar-preacher-curl-exercise.gif']] },
                     { name: 'Hip Abduction', target: 'Yan Kalça', img: 'Hip-Abduction.gif', video: ysearch('hip abduction machine form'),
-                      sets: 2, reps: '12-15', rest: 90,
-                      tip: 'Makinede ya da dizlerin üstünde lastikle. Yavaş açın, 1 sn tutun. Diz sağlığı ve yürürken denge için.',
+                      sets: 2, reps: '15', rest: 90,
+                      tip: 'Oturarak, hafif ağırlıkla. Yavaş açın, 1 sn tutun. Diz sağlığı ve yürürken denge için; zor değil, kalp dostu.',
                       alts: [['Banded Clamshell', ysearch('banded clamshell exercise'), 'Yerde yan yatarak, lastikle', 'Banded-Clamshell.jpg'], ['Side-Lying Leg Raise', ysearch('side lying leg raise form'), 'Ağırlıksız, yan yatarak', 'Side-Lying-Leg-Raise.gif']] }
                 ]
             },
             {
-                id: 'fbC', short: 'C Günü', title: 'Gün C · Tüm Vücut', muscles: 'Ön Bacak · Kalça/Bel · Omuz · Sırt · Baldır · Kor',
+                id: 'fbC', short: 'C Günü', title: 'Gün C · Tüm Vücut', muscles: 'Ön Bacak · Kalça · Omuz · Sırt · Pazu · Kor',
                 weekday: 5, weekdayName: 'Cuma', color: { light: '#4d7c0f', dark: '#a3e635' },
                 exercises: [
                     { name: 'Leg Extension', target: 'Ön Bacak', img: 'LEG-EXTENSION.gif', video: ys('iQ92TuvBqRo'),
                       sets: 3, reps: '12-15', rest: 120,
-                      tip: 'Bacakları savurmayın. Yavaş kaldırın, en tepede 1 saniye sıkıştırın.',
-                      alts: [['Leg Press', ys('EotSw18oR9w'), 'Bileşik, sırt destekli', 'Leg-Press.gif']] },
-                    { name: 'Dumbbell Romanian Deadlift', target: 'Kalça · Arka Bacak · Bel', img: 'Dumbbell-Romanian-Deadlift.gif', video: yt('xAL7lHwj30E'),
-                      sets: 2, reps: '10-12', rest: 150,
-                      tip: 'HAFİF dambıllarla. Dizler hafif bükük, kalçayı geriye iterek eğilin; sırt düz. Arka bacakta gerilme hissedince durun. 43 yaşında bel sağlığı için çok değerli.',
-                      alts: [['Glute Bridge', ysearch('glute bridge form'), 'Yerde, bele yük bindirmez', 'Glute-Bridge.gif'], ['Good Morning (sadece boş bar)', ysearch('barbell good morning form'), 'Çok hafif yapılmalı', 'Barbell-Good-Morning.gif']] },
-                    { name: 'Seated Dumbbell Shoulder Press', target: 'Omuz', img: 'Seated-Dumbbell-Shoulder-Press.gif', video: yt('k6tzKisR3NY'),
+                      tip: 'Oturarak, sırt destekli. Bacakları savurmayın; yavaş kaldırın, en tepede 1 saniye sıkıştırın.',
+                      alts: [['Banka Otur-Kalk (Box Squat)', ysearch('bodyweight box squat to bench form'), 'Ağırlıksız; arkanıza konan sehpaya oturup kalkın', '']] },
+                    { name: 'Glute Bridge', target: 'Kalça · Arka Bacak', img: 'Glute-Bridge.gif', video: ysearch('glute bridge form'), noWeight: true,
+                      sets: 2, reps: '12-15', rest: 90,
+                      tip: 'Sırtüstü, ayaklar kalçaya yakın. Topuklardan iterek kalçayı kaldırın, tepede 1 sn sıkıştırın. Yerde yapıldığı için bele ve kalbe en az yük; 4-6 hafta sonra Romanian Deadlift\'e geçebilirsiniz.',
+                      alts: [['Dumbbell Romanian Deadlift (4-6. haftadan sonra)', yt('xAL7lHwj30E'), 'Hafif dambıl, sırt düz, kalçayı geri itin', 'Dumbbell-Romanian-Deadlift.gif']] },
+                    { name: 'Machine Shoulder Press', target: 'Omuz', img: 'Machine-Shoulder-Press.gif', video: yt('6v4nrRVySj0'),
                       sets: 2, reps: '10-12', rest: 120,
-                      tip: 'Sırt mutlaka destekli olsun, ORTA ağırlık. Baş üstü itiş tansiyonu en çok yükselten harekettir: zorlanırsanız makineye geçin.',
-                      alts: [['Machine Shoulder Press', yt('6v4nrRVySj0'), 'Önerilen: daha güvenli, sabit yol', 'Machine-Shoulder-Press.gif']] },
+                      tip: 'Sırt destekli, sabit yol, ORTA ağırlık. Baş üstü itiş tansiyonu yükseltir: yavaş itin, nefes verin, zorlanırsanız seti bitirin.',
+                      alts: [['Seated Dumbbell Shoulder Press', yt('k6tzKisR3NY'), 'Serbest ağırlık; denge ister', 'Seated-Dumbbell-Shoulder-Press.gif']] },
                     { name: 'Single Arm Dumbbell Row', target: 'Sırt', img: 'Single-Arm-Dumbbell-Row.gif', video: ys('yHqqGd0tXcw'),
                       sets: 3, reps: '10-12 (her kol)', rest: 120,
                       tip: 'Elinizi ve dizinizi sehpaya dayayın. Dambılı kalçanıza doğru çekin, vücudu döndürmeyin.',
                       alts: [['Chest-Supported Row', ys('czoQ_ncuqqI'), 'Göğüs destekli, beli korur', 'f1/dumbbell-chest-supported-row-exercise.gif']] },
-                    { name: 'Standing Calf Raise', target: 'Baldır', img: 'Standing-Calf-Raise.gif', video: ysearch('standing calf raise machine form'),
-                      sets: 2, reps: '12-15', rest: 90,
-                      tip: 'Topukları yavaşça aşağı sarkıtıp parmak ucunda 1 sn durun. Haftada iki kez baldır, yürüyüşte aşil ve diz dostu.',
-                      alts: [['Machine Calf Raise', ysearch('standing calf raise machine form'), 'Makinede, omuz yastıklı', 'Machine-Calf-Raise.gif'], ['Seated Calf Raise', ysearch('seated calf raise form'), 'Oturarak, dizler bükük', 'Seated-Calf-Raise.gif'], ['Hammer Curl (kol isterseniz)', ys('_aoad2yuP5w'), 'Avuç içleri karşılıklı, oturarak', 'f1/Seated-Hammer-Curl.gif'], ['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
-                    { name: 'Plank (kısa süreli)', target: 'Tüm Kor', img: 'f2/Weighted-Front-Plank.gif', video: ys('xe2MXatLTUw'),
-                      sets: 3, reps: '20-30 sn', rest: 120, noWeight: true,
-                      breath: 'Nefesi tutmayın! Plank boyunca sakin ve düzenli nefes alıp verin. Ağırlık koymadan yapın.',
-                      tip: 'Kalça düşmesin, çok da kalkmasın; karın ve kalçayı sıkarak düz bir çizgi oluşturun. Uzun tutmak yerine kısa ve kaliteli.',
-                      alts: [['Kneeling Cable Crunch', ys('K2m0jj6RfYg'), 'Hafif ağırlıkla, kontrollü', 'f2/Kneeling-Cable-Crunch.gif'], ['Dead Bug', ysearch('dead bug exercise form'), 'Bele yük yok', 'Dead-Bug.gif']] }
+                    { name: 'Hammer Curl', target: 'Pazu / Ön Kol', img: 'f1/Seated-Hammer-Curl.gif', video: ys('_aoad2yuP5w'),
+                      sets: 2, reps: '10-12', rest: 90,
+                      tip: 'Avuç içleri birbirine bakar. Oturarak yapmak sallanmayı önler.',
+                      alts: [['EZ / Z-Bar Curl', ys('54x2WF1_Suc'), 'Bileklere daha rahat', 'f2/Z-Bar-Curl.gif']] },
+                    { name: 'Plank (kısa)', target: 'Tüm Kor', img: 'f2/Weighted-Front-Plank.gif', video: ys('xe2MXatLTUw'),
+                      sets: 2, reps: '15-20 sn', rest: 90, noWeight: true,
+                      breath: 'Nefesi tutmayın! Uzun sabit tutuşlar tansiyonu yükseltir: 20 sn yeter, boyunca sakin nefes alıp verin. Ağırlık koymayın.',
+                      tip: 'Kalça düşmesin, çok da kalkmasın; karın ve kalçayı sıkarak düz bir çizgi. Dizler yerde başlayabilirsiniz.',
+                      alts: [['Dead Bug', ysearch('dead bug exercise form'), 'Hareketli, nefes tutmaya daha az yatkın', 'Dead-Bug.gif'], ['Kneeling Cable Crunch', ys('K2m0jj6RfYg'), 'Hafif ağırlıkla, kontrollü', 'f2/Kneeling-Cable-Crunch.gif']] }
                 ]
             }
         ];
@@ -748,7 +745,7 @@
     <!-- UYGULAMA -->
     <script>
         // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
-        const APP_VERSION = { number: 18, date: '1 Kasım 2026' };
+        const APP_VERSION = { number: 19, date: '3 Kasım 2026' };
         (async () => {
             const el = document.getElementById('appVersion');
             el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
@@ -827,6 +824,24 @@
         const lightKg = w => { const n = parseFloat(String(w).replace(',', '.')); return n > 0 ? fmtKg(Math.max(0.5, n * 0.8)) : ''; };
         const setsOf = ex => Array.from({ length: lightSets(ex) }, (_, i) => String(i + 1)).concat(ex.backoff && !isLight() ? ['B'] : []);
         const totalSets = day => day.exercises.reduce((n, ex) => n + setsOf(ex).length, 0);
+        const exKey = (day, i) => `${day.id}:${day.exercises[i].name}`;
+
+        // Sürüm 18'e kadar kilo/tekrar kart sırasıyla saklanıyordu; bir kez hareket adına taşı
+        if (!store.get('keys:byName', false)) {
+            const OLD = {
+                fbA: ['Leg Press', 'Machine Chest Press', 'Lat Pulldown', 'Dumbbell Lateral Raise', 'Triceps Pushdown', 'Lying Leg Raise', 'Standing Calf Raise'],
+                fbB: ['Dumbbell Goblet Squat', 'Incline Dumbbell Press', 'Seated Cable Row', 'Face Pull', 'Lying Leg Curl', 'Dumbbell Biceps Curl', 'Hip Abduction'],
+                fbC: ['Leg Extension', 'Dumbbell Romanian Deadlift', 'Seated Dumbbell Shoulder Press', 'Single Arm Dumbbell Row', 'Standing Calf Raise', 'Plank (kısa süreli)']
+            };
+            // Yalnızca aynı ad: makine değişen hareketlerde (ör. dambıl → makine) kilolar karşılaştırılamaz, taşınmaz
+            for (const [dayId, names] of Object.entries(OLD)) names.forEach((name, i) => {
+                for (const kind of ['w', 'r', 'prev']) {
+                    const v = store.get(`${kind}:${dayId}:${i}`, null);
+                    if (v !== null && v !== '') store.set(`${kind}:${dayId}:${name}`, v);
+                }
+            });
+            store.set('keys:byName', true);
+        }
 
         // Bugün hangi gün? Antrenman günü değilse sıradakini öner.
         const wd = new Date().getDay();
@@ -880,7 +895,7 @@
         // --- Geçen sefer / çift yükseltme ---
         const repsMax = ex => { const m = String(ex.reps).match(/(\d+)\s*-\s*(\d+)/); return m ? +m[2] : null; };
         function prevLine(day, ex, i) {
-            const p = store.get(`prev:${day.id}:${i}`, null);
+            const p = store.get(`prev:${exKey(day, i)}`, null);
             if (!p || isLight()) return ''; // hafif günde ağırlık artırma önerisi yapılmaz
             const what = [p.w ? `${p.w} kg` : '', p.r ? `${p.r} ${ex.noWeight ? '' : 'tekrar'}`.trim() : ''].filter(Boolean).join(' × ');
             if (!what) return '';
@@ -957,8 +972,8 @@
         }
 
         function cardHTML(day, ex, i, done) {
-            const w = store.get(`w:${day.id}:${i}`, '');
-            const r = store.get(`r:${day.id}:${i}`, '');
+            const w = store.get(`w:${exKey(day, i)}`, '');
+            const r = store.get(`r:${exKey(day, i)}`, '');
             const sets = setsOf(ex);
             const allDone = sets.every(s => done.has(`${i}-${s}`));
             return `
@@ -1050,7 +1065,7 @@
                 card.classList.toggle('done', allDone);
                 // Hareket bitince bugünkü kilo/tekrar "geçen sefer" olarak saklanır (çift yükseltme önerisi için).
                 // Hafif günde saklanmaz: düşük kilo/az set bir sonraki öneriyi bozmasın.
-                if (allDone && !isLight()) store.set(`prev:${day.id}:${i}`, { date: todayKey(), w: store.get(`w:${day.id}:${i}`, ''), r: store.get(`r:${day.id}:${i}`, '') });
+                if (allDone && !isLight()) store.set(`prev:${exKey(day, i)}`, { date: todayKey(), w: store.get(`w:${exKey(day, i)}`, ''), r: store.get(`r:${exKey(day, i)}`, '') });
                 const finished = done.size === totalSets(day);
                 if (finished) store.set('last:' + day.id, todayKey());
                 recordDay(day, finished);
@@ -1106,8 +1121,9 @@
         });
         view.addEventListener('input', e => {
             const i = e.target.closest('.ex')?.dataset.i;
-            if (e.target.matches('[data-w]')) store.set(`w:${activeId}:${i}`, e.target.value);
-            else if (e.target.matches('[data-r]')) store.set(`r:${activeId}:${i}`, e.target.value);
+            const day = DAYS.find(d => d.id === activeId);
+            if (e.target.matches('[data-w]')) store.set(`w:${exKey(day, i)}`, e.target.value);
+            else if (e.target.matches('[data-r]')) store.set(`r:${exKey(day, i)}`, e.target.value);
         });
 
         // --- Dinlenme zamanlayıcısı ---
