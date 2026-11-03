@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v19'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+const CACHE_NAME = 'idman-app-v21'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
 // Sayfa isteği bu süreden uzun sürerse önbellekteki sayfa açılır
 const NAV_TIMEOUT = 2500;
 // Ana dosyalar
@@ -29,9 +29,8 @@ const imageUrls = [
     './Seated-Leg-Curl.gif',
     './Glute-Bridge.gif',
     './Machine-Shoulder-Press.gif',
-    './Hip-Abduction.gif',
-    './Side-Lying-Leg-Raise.gif',
-    './Banded-Clamshell.jpg',
+    './Box-Squat.gif',
+    './Hip-Thrust.gif',
     // Hareket ve muadil GIF'leri (index.html'deki DAYS listesiyle aynı tutun)
     './Leg-Press.gif',
     './LEG-EXTENSION.gif',
@@ -51,7 +50,6 @@ const imageUrls = [
     './f1/ez-bar-preacher-curl-exercise.gif',
     './f1/Seated-Hammer-Curl.gif',
     './f2/Chest-Press-Machine.gif',
-    './f2/Z-Bar-Curl.gif',
     './f2/Weighted-Front-Plank.gif',
     './f2/Kneeling-Cable-Crunch.gif'
 ];
