@@ -524,7 +524,7 @@
                 </h3>
                 <p>Bir seti işaretlediğinizde dinlenme sayacı otomatik başlar. Süreler kalbi zorlamamak için bilerek uzun tutuldu.</p>
                 <div class="rest-rows">
-                    <div class="rest-row">Leg Press <b>2,5 dk</b></div>
+                    <div class="rest-row">Leg Press (Pazartesi ve Cuma) <b>2,5 dk</b></div>
                     <div class="rest-row">Diğer büyük hareketler <b>2 dk</b> · küçük hareketler <b>1,5 dk</b></div>
                     <div class="rest-row">Hazır hissetmiyorsanız <b>+15 sn uzatın</b></div>
                 </div>
@@ -641,8 +641,7 @@
         const ys = id => 'https://www.youtube.com/shorts/' + id;
         const ysearch = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
 
-        // Program (Sürüm 20): her gün iki bacak hareketi (bir ön, bir arka bacak/kalça), makine ağırlıklı.
-        // Leg Press haftada bir (tansiyonu en çok yükselten hareket); Cuma iki oturmalı bacak makinesiyle en sakin gün.
+        // Program (Sürüm 22, kullanıcının son revizyonu): A ve C'de Leg Press (C'de hafif), B'de Leg Extension + Glute Bridge.
         // Dayanak: AHA 2023 (Paluch), ACSM 2009, Ramos-Campo 2024 (tam vücut = bölgesel, hacim eşitken).
         const DAYS = [
             {
@@ -651,7 +650,7 @@
                 exercises: [
                     { name: 'Leg Press', target: 'Bacak · Kalça', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
                       sets: 3, reps: '12-15', rest: 150,
-                      tip: 'Haftanın tek bileşik bacak hareketi: HAFİF tutun, 15 tekrarı rahat yapabileceğiniz ağırlık. Ayaklar omuz genişliğinde, kalça sehpadan kalkmasın, dizleri en üstte kilitlemeyin.',
+                      tip: 'Orta ağırlık: 12 tekrarı 2 tekrar yedekte bitirebileceğiniz kilo. Ayaklar omuz genişliğinde, kalça sehpadan kalkmasın, dizleri en üstte kilitlemeyin.',
                       breath: 'İterken nefes verin, indirirken alın. Bu harekette nefes tutmak tansiyonu en çok yükseltir: tekrarları sesli sayın.',
                       alts: [['Leg Extension', ys('iQ92TuvBqRo'), 'Nabzı daha az yükseltir; kötü günde bunu seçin', 'LEG-EXTENSION.gif'], ['Hack Squat Machine', ys('dJcCdRH_2i8'), 'Sırt destekli; ilk 2 ayda değil', 'Hack-Squat.gif']] },
                     { name: 'Machine Chest Press', target: 'Göğüs', img: 'f2/Chest-Press-Machine.gif', video: yt('Qu7-ceCvq7w'),
@@ -708,17 +707,14 @@
                 ]
             },
             {
-                id: 'fbC', short: 'C Günü', title: 'Gün C · Tüm Vücut', muscles: 'Ön Bacak · Arka Bacak · Omuz · Sırt · Yan Omuz · Arka Kol · Kor',
+                id: 'fbC', short: 'C Günü', title: 'Gün C · Tüm Vücut', muscles: 'Bacak · Kalça · Omuz · Sırt · Yan Omuz · Arka Kol · Kor',
                 weekday: 5, weekdayName: 'Cuma', color: { light: '#4d7c0f', dark: '#a3e635' },
                 exercises: [
-                    { name: 'Leg Extension', target: 'Ön Bacak', img: 'LEG-EXTENSION.gif', video: ys('iQ92TuvBqRo'),
-                      sets: 3, reps: '12-15', rest: 120,
-                      tip: 'Oturarak, sırt destekli. Bacakları savurmayın; yavaş kaldırın, en tepede 1 saniye sıkıştırın.',
-                      alts: [['Banka Otur-Kalk (Box Squat)', ysearch('bodyweight box squat to bench form'), 'Arkanıza konan sehpaya oturup kalkın; önce ağırlıksız', 'Box-Squat.gif']] },
-                    { name: 'Seated Leg Curl', target: 'Arka Bacak', img: 'Seated-Leg-Curl.gif', video: ys('yJ_KpXrN8hs'),
-                      sets: 3, reps: '12-15', rest: 120,
-                      tip: 'Oturarak, sırt destekli: nabzı en az yükselten bacak hareketlerinden. Topukları aşağı çekerken sıkıştırın, yavaşça bırakın.',
-                      alts: [['Lying Leg Curl', ys('FRy58-v0YII'), 'Yüzüstü; salonda oturmalı yoksa', 'f1/LEG_CURL.gif']] },
+                    { name: 'Leg Press (hafif)', target: 'Bacak · Kalça', img: 'Leg-Press.gif', video: ys('EotSw18oR9w'),
+                      sets: 3, reps: '12-15', rest: 150,
+                      tip: 'Pazartesinden yaklaşık %20 hafif: haftanın ikinci bacak presi kalbi yormasın diye kolay geçmeli. Ayaklar omuz genişliğinde, dizleri en üstte kilitlemeyin.',
+                      breath: 'İterken nefes verin, indirirken alın. Bu harekette nefes tutmak tansiyonu en çok yükseltir: tekrarları sesli sayın.',
+                      alts: [['Leg Extension', ys('iQ92TuvBqRo'), 'Nabzı daha az yükseltir; kötü günde bunu seçin', 'LEG-EXTENSION.gif'], ['Hack Squat Machine', ys('dJcCdRH_2i8'), 'Sırt destekli; ilk 2 ayda değil', 'Hack-Squat.gif']] },
                     { name: 'Machine Shoulder Press', target: 'Omuz', img: 'Machine-Shoulder-Press.gif', video: yt('6v4nrRVySj0'),
                       sets: 2, reps: '10-12', rest: 120,
                       tip: 'Sırt destekli, sabit yol, ORTA ağırlık. Baş üstü itiş tansiyonu yükseltir: yavaş itin, nefes verin, zorlanırsanız seti bitirin.',
@@ -748,7 +744,7 @@
     <!-- UYGULAMA -->
     <script>
         // Sürüm: her güncellemede bunu ve sw.js'deki CACHE_NAME numarasını birlikte artırın
-        const APP_VERSION = { number: 21, date: '3 Kasım 2026' };
+        const APP_VERSION = { number: 22, date: '3 Kasım 2026' };
         (async () => {
             const el = document.getElementById('appVersion');
             el.textContent = `Sürüm ${APP_VERSION.number} · ${APP_VERSION.date}`;
