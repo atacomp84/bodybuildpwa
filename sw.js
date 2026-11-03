@@ -1,4 +1,4 @@
-const CACHE_NAME = 'idman-app-v22'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
+const CACHE_NAME = 'idman-app-v23'; // Sürüm numarası sayfa sonunda (index.html'deki APP_VERSION ile aynı tutun)
 // Sayfa isteği bu süreden uzun sürerse önbellekteki sayfa açılır
 const NAV_TIMEOUT = 2500;
 // Ana dosyalar
